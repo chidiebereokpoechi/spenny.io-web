@@ -4,10 +4,25 @@
 
 body {
     margin: 0;
-    font-family: StyreneB, Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family: StyreneB, Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+        'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
+    color: #38383f;
     font-variant-numeric: tabular-nums;
+    font-size: 16px;
+
+    @apply text-slate-700;
+}
+
+.manrope {
+    @apply font-[Manrope];
+}
+
+* {
+    @apply outline-none focus:ring-4 ring-primary/20;
+}
+
+a {
+    @apply font-bold text-primary rounded focus:bg-primary/20;
 }

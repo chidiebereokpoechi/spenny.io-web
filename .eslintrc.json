@@ -1,9 +1,8 @@
 {
-    "extends": ["react-app", "react-app/jest", "prettier"],
-    "plugins": ["prettier"],
+    "extends": ["react-app", "react-app/jest"],
+    "plugins": [],
     "rules": {
         "indent": "off",
-        "prettier/prettier": ["error"],
         "linebreak-style": ["error", "unix"],
         "quotes": [
             2,

@@ -1,11 +1,7 @@
 import React from 'react'
+import { Router } from './components/routing'
+import { routes } from './pages/routes'
 
 export const App: React.FC = () => {
-    return (
-        <div>
-            <span>4512.99</span>
-            <br />
-            <span>2340.99</span>
-        </div>
-    )
+    return <Router routes={routes} />
 }

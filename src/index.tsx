@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import 'reflect-metadata'
 import { App } from './app'
 import './index.css'
 import reportWebVitals from './report-web-vitals'
