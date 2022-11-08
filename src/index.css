@@ -15,6 +15,10 @@ body {
     @apply text-slate-700;
 }
 
+#root {
+    @apply text-xs;
+}
+
 .manrope {
     @apply font-[Manrope];
 }
@@ -24,5 +28,5 @@ body {
 }
 
 a {
-    @apply font-bold text-primary rounded focus:bg-primary/20;
+    @apply font-bold text-primary rounded focus:bg-primary/20 focus:text-primary-dark;
 }
