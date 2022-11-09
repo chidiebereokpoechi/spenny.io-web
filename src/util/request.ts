@@ -28,11 +28,12 @@ export const request = <M = any, N = null>(
     method: HttpMethod,
     options?: RequestOptions<M>
 ): Observable<Response<N>> => {
-    let token = stores.auth.authResponse?.token
+    let token = stores.auth.token
 
     const init: RequestInit = {
         method,
         headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
         cache: 'default',
@@ -69,6 +70,7 @@ export const request = <M = any, N = null>(
         body: init.body,
         method: init.method,
         headers: init.headers,
+        withCredentials: true,
     }).pipe(
         catchError((error) => {
             if (error instanceof AjaxError) {

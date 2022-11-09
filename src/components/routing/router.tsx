@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Route as RouteDefinition } from '../../pages/routes'
 import { useStores } from '../../util/stores'
@@ -10,7 +10,13 @@ interface Props {
 }
 
 export const Router: React.FC<Props> = observer(({ routes }) => {
-    const { auth } = useStores()
+    const { auth, user } = useStores()
+
+    useEffect(() => {
+        if (auth.authenticated && !user.user) {
+            user.getAuthenticatedUser().subscribe()
+        }
+    }, [auth.authenticated, user])
 
     return auth.ready ? (
         <BrowserRouter>

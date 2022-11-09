@@ -22,6 +22,10 @@ export const AUTH_REQUIREMENTS: Record<AuthRequirement, () => AuthRequirementRes
 }
 
 export const RouteWrapper: React.FC<Props> = observer(({ title, component: Component, authRequirements }) => {
+    useEffect(() => {
+        document.title = title
+    }, [title])
+
     for (const requirement of authRequirements) {
         const [verified, route] = AUTH_REQUIREMENTS[requirement]()
 
@@ -30,13 +34,5 @@ export const RouteWrapper: React.FC<Props> = observer(({ title, component: Compo
         }
     }
 
-    useEffect(() => {
-        document.title = title
-    }, [title])
-
-    return (
-        <>
-            <Component />
-        </>
-    )
+    return <Component />
 })

@@ -7,15 +7,15 @@ import { dehydrateToStorage, hydrateFromStorage, removeFromStorage, Resettable }
 import { request } from '../util/request'
 import { stores } from '../util/stores'
 
-const AUTH_KEY = 'SPENNY.IO:AUTH'
+const API_TOKEN_KEY = 'SPENNY.IO:API_TOKEN'
 
 export class AuthStore implements Resettable {
-    public authResponse!: AuthResponse | null
+    public token: string | null = null
     public ready = false
 
     @computed
     public get authenticated() {
-        return !!this.authResponse?.token
+        return !!this.token
     }
 
     constructor() {
@@ -25,7 +25,7 @@ export class AuthStore implements Resettable {
 
     @action
     public setUp(): void {
-        this.authResponse = hydrateFromStorage(AUTH_KEY)
+        this.token = hydrateFromStorage(API_TOKEN_KEY)
         this.ready = true
     }
 
@@ -35,7 +35,8 @@ export class AuthStore implements Resettable {
             tap((response) => {
                 runInAction(() => {
                     if (response.data) {
-                        this.authResponse = response.data
+                        this.setToken(response.data.token)
+                        stores.user.setUser(response.data.user)
                     }
                 })
             })
@@ -43,15 +44,15 @@ export class AuthStore implements Resettable {
     }
 
     @action
-    public setAuthResponse(authResponse: AuthResponse): void {
-        this.authResponse = authResponse
-        dehydrateToStorage(AUTH_KEY, authResponse)
+    public setToken(token: string): void {
+        this.token = token
+        dehydrateToStorage(API_TOKEN_KEY, token)
     }
 
     @action
     public reset(): void {
-        this.authResponse = null
-        removeFromStorage(AUTH_KEY)
+        this.token = null
+        removeFromStorage(API_TOKEN_KEY)
     }
 
     @action
