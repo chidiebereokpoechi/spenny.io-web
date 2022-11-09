@@ -63,7 +63,7 @@ export const CreateCategoryModal: React.FC<ModalProps> = observer((props) => {
                             <div className="grid grid-cols-1 gap-2">
                                 <label className="text-xs text-slate-500">Category preview</label>
                                 <ColorPreview
-                                    label={values.label ?? 'This is an example'}
+                                    label={values.label}
                                     color={values.color}
                                     backgroundColor={values.backgroundColor}
                                 />

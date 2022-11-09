@@ -1,4 +1,6 @@
 import { IsHexColor, MinLength, ValidateIf } from 'class-validator'
+import { find } from 'lodash'
+import { stores } from '../../../util/stores'
 import { BaseModel } from '../base.model'
 
 export class CreateCategoryModel extends BaseModel {
@@ -14,4 +16,15 @@ export class CreateCategoryModel extends BaseModel {
 
     @IsHexColor()
     public color: string = '#FFFFFF'
+
+    public generateCustomValidation() {
+        const categories = stores.categoriesStore.categories
+        const errors: Partial<Record<keyof BaseModel, string[]>> = {}
+
+        if (find(categories, { label: this.label })) {
+            errors.label = ['Label already exists']
+        }
+
+        return errors
+    }
 }

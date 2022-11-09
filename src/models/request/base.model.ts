@@ -1,3 +1,7 @@
+export interface BaseModel {
+    // Used to generate custom validation messages
+    generateCustomValidation?(): Partial<Record<keyof BaseModel, string[]>>
+}
 export abstract class BaseModel {
     [fieldName: string]: any
 
@@ -8,7 +12,4 @@ export abstract class BaseModel {
     public finalize?: () => void
 
     public getRequestBody?: () => any
-
-    // Used to generate custom validation messages
-    public generateCustomValidation?: () => Partial<Record<keyof BaseModel, string[]>>
 }

@@ -21,8 +21,9 @@ export interface ColorInputProps {
 const defaultColors: string[] = [
     ...Palette.Scales,
     ...Palette.PinkFoam,
-    ...Palette.OrangeToPurple,
     ...Palette.BlueToRed,
+    ...Palette.Slate,
+    ...Palette.Primary,
 ]
 
 export const ColorInput: React.FC<ColorInputProps> = ({
