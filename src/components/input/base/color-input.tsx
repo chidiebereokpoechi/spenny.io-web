@@ -1,8 +1,9 @@
 import { Popover } from '@headlessui/react'
 import { CirclePicker } from 'react-color'
-import React from 'react'
+import React, { useState } from 'react'
 import { classNames } from '../../../util/misc'
 import { ValidationMessage } from '../../layout'
+import { HexColorPicker } from 'react-colorful'
 
 export interface ColorInputProps {
     name: string
@@ -41,6 +42,7 @@ const colors: string[] = [
 
 export const ColorInput: React.FC<ColorInputProps> = ({ className, label, errors, onChange, value, placeholder }) => {
     const invalid = !!errors?.length
+    const [isCustom, setIsCustom] = useState(false)
 
     return (
         <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
@@ -77,23 +79,34 @@ export const ColorInput: React.FC<ColorInputProps> = ({ className, label, errors
                     )}
                 >
                     {({ close }) => (
-                        <CirclePicker
-                            colors={colors}
-                            styles={{
-                                default: {
-                                    card: {
-                                        boxShadow: 'none',
-                                    },
-                                },
-                            }}
-                            className="shadow-none"
-                            color={value}
-                            onChangeComplete={(color) => {
-                                console.log(onChange)
-                                onChange?.(color.hex.toUpperCase())
-                                close()
-                            }}
-                        />
+                        <>
+                            {isCustom && (
+                                <HexColorPicker
+                                    className="!w-full"
+                                    color={value}
+                                    onChange={(color) => {
+                                        onChange?.(color.toUpperCase())
+                                    }}
+                                />
+                            )}
+                            {!isCustom && (
+                                <CirclePicker
+                                    colors={colors}
+                                    styles={{
+                                        default: {
+                                            card: {
+                                                boxShadow: 'none',
+                                            },
+                                        },
+                                    }}
+                                    color={value}
+                                    onChangeComplete={(color) => {
+                                        onChange?.(color.hex.toUpperCase())
+                                        close()
+                                    }}
+                                />
+                            )}
+                        </>
                     )}
                 </Popover.Panel>
             </Popover>
