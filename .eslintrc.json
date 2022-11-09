@@ -1,6 +1,7 @@
 {
-    "extends": ["react-app", "react-app/jest"],
-    "plugins": [],
+    "extends": ["react-app", "react-app/jest", "plugin:@typescript-eslint/recommended"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
     "rules": {
         "indent": "off",
         "linebreak-style": ["error", "unix"],
@@ -14,8 +15,9 @@
         "semi": ["error", "never"],
         "no-unused-vars": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-unused-vars": ["error"],
+        "@typescript-eslint/no-unused-vars": ["off"],
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
         "eqeqeq": "error"
     }
 }

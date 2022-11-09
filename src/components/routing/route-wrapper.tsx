@@ -2,6 +2,7 @@ import { observer } from 'mobx-react'
 import React, { useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
 import { AuthRequirement, RouteLink } from '../../util/constants'
+import { stores } from '../../util/stores'
 
 interface Props {
     title: string
@@ -13,10 +14,10 @@ type AuthRequirementResponse = [boolean, RouteLink]
 
 export const AUTH_REQUIREMENTS: Record<AuthRequirement, () => AuthRequirementResponse> = {
     [AuthRequirement.AUTHENTICATED]() {
-        return [true, RouteLink.LOG_IN] as AuthRequirementResponse
+        return [stores.auth.authenticated, RouteLink.LOG_IN] as AuthRequirementResponse
     },
     [AuthRequirement.UNAUTHENTICATED]() {
-        return [true, RouteLink.DASHBOARD]
+        return [!stores.auth.authenticated, RouteLink.DASHBOARD]
     },
 }
 
