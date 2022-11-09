@@ -1,8 +1,8 @@
 import { Formik, FormikHelpers } from 'formik'
 import { observer } from 'mobx-react'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { PrimaryButton } from '../../../components/buttons'
-import { FormTextAreaInput, FormTextInput } from '../../../components/input'
+import { FormSelectInput, FormTextAreaInput, FormTextInput } from '../../../components/input'
 import { CenterModal, ModalProps } from '../../../components/modals'
 import { CreateTransactionModel } from '../../../models/request'
 import { Tracker } from '../../../models/response'
@@ -14,7 +14,8 @@ interface Props extends ModalProps {
 }
 
 export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...props }) => {
-    const { transactionsStore } = useStores()
+    const { categoriesStore, transactionsStore } = useStores()
+    const categories = categoriesStore.categories
     const hasTransactions = transactionsStore.transactions.length > 0
     const submitButtonText = hasTransactions ? 'Create transaction' : 'Create first transaction'
     const setIsOpen = props.setIsOpen
@@ -40,6 +41,13 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
         [transactionsStore, close]
     )
 
+    useEffect(() => {
+        const subscription = categoriesStore.listCategories().subscribe()
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [categoriesStore])
+
     return (
         <CenterModal {...props}>
             <Formik initialValues={new CreateTransactionModel(tracker)} validate={validateModel} onSubmit={onSubmit}>
@@ -61,6 +69,17 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
                             <FormTextInput name="amount" label="Amount" placeholder="Amount: eg. 4.99" type="number" />
                             <FormTextInput name="date" label="Date" placeholder="Date: eg. 31/01/1999" type="date" />
                             <FormTextInput name="every" label="Every" placeholder="Every: eg. 1" type="number" />
+                            <FormSelectInput
+                                name="categories"
+                                label="Categories"
+                                placeholder="Categories"
+                                multiple
+                                options={categories}
+                                accessor={{
+                                    display: 'label',
+                                    value: 'id',
+                                }}
+                            />
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">
                             <PrimaryButton type="submit" className="w-full">
