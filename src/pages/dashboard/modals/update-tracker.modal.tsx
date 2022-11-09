@@ -2,20 +2,19 @@ import { Formik, FormikHelpers } from 'formik'
 import { observer } from 'mobx-react'
 import React, { useCallback } from 'react'
 import { PrimaryButton } from '../../../components/buttons'
-import { FormColorInput, FormTextAreaInput, FormTextInput } from '../../../components/input'
+import { FormTextAreaInput, FormTextInput } from '../../../components/input'
 import { CenterModal, ModalProps } from '../../../components/modals'
-import { UpdateCategoryModel } from '../../../models/request'
-import { Category } from '../../../models/response'
+import { UpdateTrackerModel } from '../../../models/request'
+import { Tracker } from '../../../models/response'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
-import { ColorPreview } from '../components'
 
 interface Props extends ModalProps {
-    category: Category
+    tracker: Tracker
 }
 
-export const UpdateCategoryModal: React.FC<Props> = observer(({ category, ...props }) => {
-    const { categoriesStore } = useStores()
+export const UpdateTrackerModal: React.FC<Props> = observer(({ tracker, ...props }) => {
+    const { trackersStore } = useStores()
     const setIsOpen = props.setIsOpen
 
     const close = useCallback(() => {
@@ -23,10 +22,10 @@ export const UpdateCategoryModal: React.FC<Props> = observer(({ category, ...pro
     }, [setIsOpen])
 
     const onSubmit = useCallback(
-        (values: UpdateCategoryModel, helpers: FormikHelpers<UpdateCategoryModel>) => {
+        (values: UpdateTrackerModel, helpers: FormikHelpers<UpdateTrackerModel>) => {
             helpers.setSubmitting(true)
 
-            categoriesStore.updateCategory(category.id, values).subscribe({
+            trackersStore.updateTracker(tracker.id, values).subscribe({
                 next(response) {
                     helpers.setSubmitting(false)
 
@@ -36,44 +35,28 @@ export const UpdateCategoryModal: React.FC<Props> = observer(({ category, ...pro
                 },
             })
         },
-        [categoriesStore, close, category]
+        [trackersStore, close, tracker]
     )
 
     return (
         <CenterModal {...props}>
-            <Formik
-                enableReinitialize
-                initialValues={new UpdateCategoryModel(category)}
-                validate={validateModel}
-                onSubmit={onSubmit}
-            >
-                {({ dirty, initialValues, isSubmitting, values, handleSubmit }) => (
+            <Formik initialValues={new UpdateTrackerModel(tracker)} validate={validateModel} onSubmit={onSubmit}>
+                {({ dirty, initialValues, isSubmitting, handleSubmit }) => (
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-[3rem]">
                         <header className="grid grid-cols-1 gap-4 overflow-hidden">
                             <span className="text-3xl font-extrabold text-black break-words">
                                 Edit {initialValues.label}
                             </span>
                             <div>
-                                <span>Update the details of your category</span>
+                                <span>Update the details of your tracker</span>
                             </div>
                         </header>
                         <main className="grid grid-cols-1 gap-4">
-                            <FormTextInput name="label" label="Label" placeholder="Label: eg. Finance" />
+                            <FormTextInput name="label" label="Label" placeholder="Label: eg. Subscriptions" />
                             <FormTextAreaInput
                                 name="description"
                                 label="Description"
-                                placeholder="Description (optional): eg. Transactions related to finance"
-                            />
-                            <FormColorInput
-                                name="backgroundColor"
-                                label="Background color"
-                                placeholder="Background color"
-                            />
-                            <FormColorInput name="color" label="Text color" placeholder="Text color" />
-                            <ColorPreview
-                                label={values.label}
-                                color={values.color}
-                                backgroundColor={values.backgroundColor}
+                                placeholder="Description: eg. Tracking my subscriptions"
                             />
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">

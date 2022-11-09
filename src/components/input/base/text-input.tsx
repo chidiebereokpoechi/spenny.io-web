@@ -15,7 +15,7 @@ export const TextInput: React.FC<TextInputProps> = ({ className, label, errors, 
 
     return (
         <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
-            {props.value && (
+            {!!props.value && (
                 <label htmlFor={props.name} className="text-xs text-slate-500">
                     {label}
                 </label>

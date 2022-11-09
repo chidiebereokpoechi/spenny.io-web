@@ -1,23 +1,27 @@
 import { motion } from 'framer-motion'
 import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { PrimaryButton } from '../../components/buttons'
 import { DashboardPageWrapper } from '../../components/layout'
 import { Tracker } from '../../models/response'
+import { RouteLink } from '../../util/constants'
 import { useStores } from '../../util/stores'
 import { CreateTrackerModal } from './modals'
 
-const TrackerButton: React.FC<Tracker> = ({ label, description }) => {
+const TrackerButton: React.FC<Tracker> = ({ id, label, description }) => {
     return (
-        <motion.div
-            className="bg-white rounded-lg aspect-square shadow-lg flex flex-col justify-end overflow-hidden bg-gradient-to-b from-cyan-500 to-blue-500"
-            whileHover={{ scale: 1.025 }}
-        >
-            <div className="bg-gradient-to-b from-black/0 to-black/60 flex flex-col space-y-1 p-5">
-                <span className="text-[16px] font-bold text-white">{label}</span>
-                <span className="text-[10px] text-slate-300">{description ?? 'No description'}</span>
-            </div>
-        </motion.div>
+        <Link to={`${RouteLink.Trackers}/${id}`}>
+            <motion.div
+                className="bg-white rounded-lg aspect-square shadow-lg flex flex-col justify-end overflow-hidden bg-gradient-to-b from-cyan-500 to-blue-500"
+                whileHover={{ scale: 1.025 }}
+            >
+                <div className="bg-gradient-to-b from-black/0 to-black/60 flex flex-col space-y-1 p-5">
+                    <span className="text-[16px] font-bold text-white">{label}</span>
+                    <span className="text-[10px] text-slate-300">{description ?? 'No description'}</span>
+                </div>
+            </motion.div>
+        </Link>
     )
 }
 

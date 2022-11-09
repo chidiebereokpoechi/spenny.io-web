@@ -5,5 +5,7 @@ export enum RouteLink {
     LogIn = '/auth/login',
     Dashboard = '/dashboard',
     Categories = '/categories',
+    Trackers = '/trackers',
+    ViewTracker = '/trackers/:id',
     Profile = '/profile',
 }

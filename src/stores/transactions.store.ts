@@ -1,11 +1,80 @@
-import { action } from 'mobx'
+import { action, runInAction } from 'mobx'
+import { tap } from 'rxjs'
+import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
 import { Transaction } from '../models/response'
-import { Resettable } from '../util/misc'
+import { HttpMethod } from '../util/constants'
+import { dehydrateToStorage, Resettable } from '../util/misc'
+import { request } from '../util/request'
+
+const TRANSACTIONS_KEY = 'SPENNY.IO:TRANSACTIONS'
 
 export class TransactionsStore implements Resettable {
     public transactions: Transaction[] = []
     public loading: boolean = false
     public ready: boolean = false
+
+    @action
+    public createTransaction(model: CreateTransactionModel) {
+        this.loading = true
+
+        return request<CreateTransactionModel, Transaction>('/transactions', HttpMethod.Post, {
+            body: model.getRequestBody(),
+        }).pipe(
+            tap((response) => {
+                runInAction(() => {
+                    this.loading = false
+
+                    if (response.data) {
+                        this.listTransactionsForTracker(model.trackerId).subscribe()
+                    }
+                })
+            })
+        )
+    }
+
+    @action
+    public updateTransaction(id: number, model: UpdateTransactionModel) {
+        this.loading = true
+
+        return request<UpdateTransactionModel, Transaction>(`/transactions/${id}`, HttpMethod.Patch, {
+            body: model.getRequestBody(),
+        }).pipe(
+            tap((response) => {
+                runInAction(() => {
+                    this.loading = false
+
+                    if (response.data) {
+                        this.listTransactionsForTracker(model.trackerId).subscribe()
+                    }
+                })
+            })
+        )
+    }
+
+    @action
+    public listTransactionsForTracker(trackerId: number) {
+        this.ready = false
+        this.loading = true
+
+        return request<never, Transaction[]>(`/transactions/tracker/${trackerId}`, HttpMethod.Get).pipe(
+            tap((response) => {
+                runInAction(() => {
+                    this.ready = true
+                    this.loading = false
+
+                    if (response.data) {
+                        this.setTransactions(response.data)
+                    }
+                })
+            })
+        )
+    }
+
+    @action
+    public setTransactions(transactions: Transaction[]): void {
+        this.transactions = transactions
+        dehydrateToStorage(TRANSACTIONS_KEY, transactions)
+    }
 
     @action
     public reset() {

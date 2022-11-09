@@ -1,6 +1,6 @@
 import { AuthRequirement, RouteLink } from '../util/constants'
 import { LogInPage, SignUpPage } from './auth'
-import { CategoriesPage, DashboardPage } from './dashboard'
+import { CategoriesPage, DashboardPage, TrackerPage } from './dashboard'
 
 type Component = React.FC | React.LazyExoticComponent<any>
 type RoutePath = RouteLink & string
@@ -17,4 +17,5 @@ export const routes: Route[] = [
     [[RouteLink.SignUp], 'Sign up for spenny.io', SignUpPage, [AuthRequirement.Unauthenticated]],
     [[RouteLink.Dashboard], 'Dashboard', DashboardPage, [AuthRequirement.Authenticated]],
     [[RouteLink.Categories], 'Categories', CategoriesPage, [AuthRequirement.Authenticated]],
+    [[RouteLink.ViewTracker], 'Tracker', TrackerPage, [AuthRequirement.Authenticated]],
 ]

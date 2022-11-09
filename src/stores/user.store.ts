@@ -74,9 +74,4 @@ export class UserStore implements Resettable {
         this.user = null
         removeFromStorage(USER_KEY)
     }
-
-    @action
-    public signOut(): void {
-        stores.reset()
-    }
 }
