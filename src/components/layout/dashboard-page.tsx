@@ -10,7 +10,7 @@ export const DashboardPageWrapper: React.FC<Props> = ({ children }) => {
     return (
         <div className="h-screen w-screen bg-slate-100 flex flex-col">
             <TopBar />
-            <div className="flex flex-1 divide-x divide-slate-200">
+            <div className="flex flex-1 divide-x-2 divide-slate-200">
                 <SideBar />
                 <main className="flex flex-col flex-1">{children}</main>
             </div>

@@ -18,7 +18,7 @@ const SideBarLink: React.FC<SideBarLinkProps> = ({ link, label, onClick }) => {
             to={link}
             className={classNames(
                 'h-12 flex items-center justify-start px-5 rounded-lg',
-                active ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400 border border-slate-200'
+                active ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400 border-2 border-slate-200'
             )}
             onClick={onClick}
         >
