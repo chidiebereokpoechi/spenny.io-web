@@ -17,8 +17,10 @@ const SideBarLink: React.FC<SideBarLinkProps> = ({ link, label, onClick }) => {
         <Link
             to={link}
             className={classNames(
-                'h-12 flex items-center justify-start px-5 rounded-lg',
-                active ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400 border-2 border-slate-200'
+                'h-10 flex items-center justify-center px-5 rounded-lg',
+                active
+                    ? 'bg-slate-900 text-white ring-4 ring-primary'
+                    : 'bg-slate-50 text-slate-400 border-2 border-slate-200 hover:bg-slate-200 focus:bg-slate-200 ring-primary-dark'
             )}
             onClick={onClick}
         >
@@ -39,7 +41,7 @@ export const SideBar: React.FC = observer(() => {
     )
 
     return (
-        <aside className="bg-slate-50 w-80 flex flex-col justify-between">
+        <aside className="bg-slate-50 w-48 flex flex-col justify-between">
             <nav className="flex flex-col space-y-4 p-8">
                 <SideBarLink link={RouteLink.DASHBOARD} label="Dashboard" />
                 <SideBarLink link={RouteLink.CATEGORIES} label="Categories" />
