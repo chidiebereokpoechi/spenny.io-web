@@ -13,5 +13,5 @@ export class CreateCategoryModel extends BaseModel {
     public backgroundColor: string = '#334155'
 
     @IsHexColor()
-    public color: string = '#334155'
+    public color: string = '#FFFFFF'
 }

@@ -8,6 +8,7 @@ import { UpdateCategoryModel } from '../../../models/request'
 import { Category } from '../../../models/response'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
+import { ColorPreview } from '../components'
 
 interface Props extends ModalProps {
     category: Category
@@ -46,7 +47,7 @@ export const UpdateCategoryModal: React.FC<Props> = observer(({ category, ...pro
                 validate={validateModel}
                 onSubmit={onSubmit}
             >
-                {({ handleSubmit }) => (
+                {({ dirty, isSubmitting, values, handleSubmit }) => (
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-[3rem]">
                         <header className="grid grid-cols-1 gap-4">
                             <span className="text-3xl font-extrabold text-black">Edit category</span>
@@ -67,11 +68,26 @@ export const UpdateCategoryModal: React.FC<Props> = observer(({ category, ...pro
                                 label="Background color"
                                 placeholder="Background color"
                             />
+                            <div className="grid grid-cols-1 gap-2">
+                                <label className="text-xs text-slate-500">Category preview</label>
+                                <ColorPreview
+                                    label={values.label ?? 'This is an example'}
+                                    color={values.color}
+                                    backgroundColor={values.backgroundColor}
+                                />
+                            </div>
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">
-                            <PrimaryButton type="submit" className="w-full">
-                                <span>Edit category</span>
-                            </PrimaryButton>
+                            {!dirty && (
+                                <PrimaryButton type="button" className="w-full cancel" onClick={close}>
+                                    <span>Close</span>
+                                </PrimaryButton>
+                            )}
+                            {dirty && (
+                                <PrimaryButton type="submit" className="w-full" loading={isSubmitting}>
+                                    <span>Save category</span>
+                                </PrimaryButton>
+                            )}
                         </footer>
                     </form>
                 )}

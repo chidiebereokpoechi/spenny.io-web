@@ -7,6 +7,7 @@ import { CenterModal, ModalProps } from '../../../components/modals'
 import { CreateCategoryModel } from '../../../models/request'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
+import { ColorPreview } from '../components'
 
 export const CreateCategoryModal: React.FC<ModalProps> = observer((props) => {
     const { categoriesStore } = useStores()
@@ -38,7 +39,7 @@ export const CreateCategoryModal: React.FC<ModalProps> = observer((props) => {
     return (
         <CenterModal {...props}>
             <Formik initialValues={new CreateCategoryModel()} validate={validateModel} onSubmit={onSubmit}>
-                {({ handleSubmit }) => (
+                {({ isSubmitting, values, handleSubmit }) => (
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-[3rem]">
                         <header className="grid grid-cols-1 gap-4">
                             <span className="text-3xl font-extrabold text-black">Create a new category</span>
@@ -59,9 +60,17 @@ export const CreateCategoryModal: React.FC<ModalProps> = observer((props) => {
                                 label="Background color"
                                 placeholder="Background color"
                             />
+                            <div className="grid grid-cols-1 gap-2">
+                                <label className="text-xs text-slate-500">Category preview</label>
+                                <ColorPreview
+                                    label={values.label ?? 'This is an example'}
+                                    color={values.color}
+                                    backgroundColor={values.backgroundColor}
+                                />
+                            </div>
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">
-                            <PrimaryButton type="submit" className="w-full">
+                            <PrimaryButton type="submit" className="w-full" loading={isSubmitting}>
                                 <span>{submitButtonText}</span>
                             </PrimaryButton>
                         </footer>

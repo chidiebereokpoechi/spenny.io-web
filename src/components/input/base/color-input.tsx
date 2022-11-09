@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { classNames } from '../../../util/misc'
 import { ValidationMessage } from '../../layout'
 import { HexColorPicker } from 'react-colorful'
+import { PrimaryButton } from '../../buttons'
+import { Palette } from '../../../util/constants'
 
 export interface ColorInputProps {
     name: string
@@ -11,36 +13,27 @@ export interface ColorInputProps {
     label: string
     errors?: string[]
     placeholder?: string
+    colors?: string[]
     onChange?: (...args: any[]) => any
     value?: string
 }
 
-const colors: string[] = [
-    '#F44E3B',
-    '#D33115',
-    '#9F0500',
-    '#C45100',
-    '#E27300',
-    '#FE9200',
-    '#FB9E00',
-    '#FCC400',
-    '#FCDC00',
-    '#DBDF00',
-    '#808900',
-    '#B0BC00',
-    '#A4DD00',
-    '#333333',
-    '#808080',
-    '#cccccc',
-    '#000000',
-    '#666666',
-    '#B3B3B3',
-    '#4D4D4D',
-    '#999999',
-    '#FFFFFF',
+const defaultColors: string[] = [
+    ...Palette.Scales,
+    ...Palette.PinkFoam,
+    ...Palette.OrangeToPurple,
+    ...Palette.BlueToRed,
 ]
 
-export const ColorInput: React.FC<ColorInputProps> = ({ className, label, errors, onChange, value, placeholder }) => {
+export const ColorInput: React.FC<ColorInputProps> = ({
+    className,
+    label,
+    errors,
+    onChange,
+    value,
+    colors,
+    placeholder,
+}) => {
     const invalid = !!errors?.length
     const [isCustom, setIsCustom] = useState(false)
 
@@ -74,13 +67,19 @@ export const ColorInput: React.FC<ColorInputProps> = ({ className, label, errors
                 <Popover.Panel
                     className={classNames(
                         'absolute w-full z-10 bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 p-5',
-                        'flex items-center border-2 bg-slate-50 text-xs rounded-lg',
-                        'outline-none justify-center'
+                        'flex flex-col items-center border-2 bg-slate-50 text-xs rounded-lg space-y-8',
+                        'outline-none justify-center shadow-lg'
                     )}
                 >
                     {({ close }) => (
                         <>
-                            {isCustom && (
+                            <button
+                                onClick={() => close()}
+                                className="absolute right-2 top-2 text-slate-100 bg-slate-400 focus:bg-slate-600 hover:bg-slate-600 rounded px-4 py-1 font-bold text-[10px]"
+                            >
+                                <span>Close</span>
+                            </button>
+                            {isCustom ? (
                                 <HexColorPicker
                                     className="!w-full"
                                     color={value}
@@ -88,10 +87,9 @@ export const ColorInput: React.FC<ColorInputProps> = ({ className, label, errors
                                         onChange?.(color.toUpperCase())
                                     }}
                                 />
-                            )}
-                            {!isCustom && (
+                            ) : (
                                 <CirclePicker
-                                    colors={colors}
+                                    colors={colors ?? defaultColors}
                                     styles={{
                                         default: {
                                             card: {
@@ -102,10 +100,12 @@ export const ColorInput: React.FC<ColorInputProps> = ({ className, label, errors
                                     color={value}
                                     onChangeComplete={(color) => {
                                         onChange?.(color.hex.toUpperCase())
-                                        close()
                                     }}
                                 />
                             )}
+                            <PrimaryButton className="w-full" type="button" onClick={() => setIsCustom((x) => !x)}>
+                                <span>{isCustom ? 'Choose from presets' : 'Use custom color'}</span>
+                            </PrimaryButton>
                         </>
                     )}
                 </Popover.Panel>
