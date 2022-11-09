@@ -15,7 +15,7 @@ export class CreateCategoryModel extends BaseModel {
     public backgroundColor: string = '#334155'
 
     @IsHexColor()
-    public color: string = '#FFFFFF'
+    public color: string = '#F8FAFC'
 
     public generateCustomValidation() {
         const categories = stores.categoriesStore.categories

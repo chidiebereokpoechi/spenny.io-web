@@ -1,5 +1,6 @@
 import { action, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
+import { LogInModel, SignUpModel } from '../models/request'
 import { User } from '../models/response'
 import { HttpMethod } from '../util/constants'
 import { dehydrateToStorage, hydrateFromStorage, removeFromStorage, Resettable } from '../util/misc'
@@ -35,6 +36,23 @@ export class UserStore implements Resettable {
 
                     if (response.data) {
                         this.setUser(response.data)
+                    }
+                })
+            })
+        )
+    }
+
+    @action
+    public signUp(model: SignUpModel) {
+        return request<SignUpModel, User>('/users', HttpMethod.Post, { body: model }).pipe(
+            tap((response) => {
+                runInAction(() => {
+                    if (response.data) {
+                        const login = new LogInModel()
+                        login.login = model.username
+                        login.password = model.password
+
+                        stores.authStore.logIn(login).subscribe()
                     }
                 })
             })
