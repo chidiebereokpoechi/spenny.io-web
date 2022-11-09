@@ -18,12 +18,12 @@ export const TextInput: React.FC<TextInputProps> = ({ className, label, errors, 
             {label && <label className="text-xs text-slate-500">{label}</label>}
             <motion.input
                 className={classNames(
-                    'h-10 border-[2px] border-slate-200 bg-slate-50 px-5 text-xs rounded-lg',
+                    'h-10 border-[2px] bg-slate-50 px-5 text-xs rounded-lg',
                     'outline-none focus:ring-4',
                     invalid
-                        ? 'hover:border-red-900/20 focus:border-red-600 ring-red-600/20 text-red-600'
+                        ? 'hover:border-red-900/20 focus:border-red-600 ring-red-600/20 text-red-600 placeholder:text-red-400 border-red-200'
                         : 'hover:border-primary/20 focus:border-primary ring-primary/20',
-                    'placeholder:text-slate-400'
+                    'placeholder:text-slate-400 border-slate-200'
                 )}
                 {...props}
             />

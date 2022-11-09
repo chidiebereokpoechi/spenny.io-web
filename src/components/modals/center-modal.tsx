@@ -24,7 +24,7 @@ export const CenterModal: React.FC<Props> = ({ children, className, isOpen, setI
                 >
                     <button
                         onClick={close}
-                        className="absolute right-4 top-4 text-slate-100 bg-slate-600 hover:bg-slate-400 rounded px-4 py-1 font-bold text-[10px]"
+                        className="absolute right-4 top-4 text-slate-100 bg-slate-400 focus:bg-slate-600 hover:bg-slate-600 rounded px-4 py-1 font-bold text-[10px]"
                     >
                         <span>Close</span>
                     </button>

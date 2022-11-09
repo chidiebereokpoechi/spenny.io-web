@@ -10,9 +10,9 @@ export const ValidationMessage: React.FC<Props> = ({ message, type }) => {
     return (
         <div
             className={classNames(
-                type === 'error' && 'text-red-800 bg-red-100',
-                type === 'info' && 'text-slate-800 bg-slate-50',
-                'rounded px-4 py-1.5 font-bold'
+                type === 'error' && 'text-red-800 border-red-200 bg-red-100',
+                type === 'info' && 'text-slate-800 border-slate-100 bg-slate-50',
+                'border-[2px] rounded px-5 py-2 font-bold'
             )}
         >
             <span>{message}</span>

@@ -23,9 +23,12 @@ export const CreateTrackerModal: React.FC<ModalProps> = observer((props) => {
             helpers.setSubmitting(true)
 
             trackersStore.createTracker(values).subscribe({
-                next() {
+                next(response) {
                     helpers.setSubmitting(false)
-                    close()
+
+                    if (response.data) {
+                        close()
+                    }
                 },
             })
         },
@@ -44,8 +47,11 @@ export const CreateTrackerModal: React.FC<ModalProps> = observer((props) => {
                             </div>
                         </header>
                         <main className="grid grid-cols-1 gap-4">
-                            <FormTextInput name="label" placeholder="Label" />
-                            <FormTextAreaInput name="description" placeholder="Description" />
+                            <FormTextInput name="label" placeholder="Label: eg. Subscriptions" />
+                            <FormTextAreaInput
+                                name="description"
+                                placeholder="Description: eg. Tracking my subscriptions"
+                            />
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">
                             <PrimaryButton type="submit" className="w-full">
