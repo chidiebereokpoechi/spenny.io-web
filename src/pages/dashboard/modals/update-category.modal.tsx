@@ -62,20 +62,17 @@ export const UpdateCategoryModal: React.FC<Props> = observer(({ category, ...pro
                                 label="Description"
                                 placeholder="Description (optional): eg. Transactions related to finance"
                             />
-                            <FormColorInput name="color" label="Text color" placeholder="Text color" />
                             <FormColorInput
                                 name="backgroundColor"
                                 label="Background color"
                                 placeholder="Background color"
                             />
-                            <div className="grid grid-cols-1 gap-2">
-                                <label className="text-xs text-slate-500">Category preview</label>
-                                <ColorPreview
-                                    label={values.label}
-                                    color={values.color}
-                                    backgroundColor={values.backgroundColor}
-                                />
-                            </div>
+                            <FormColorInput name="color" label="Text color" placeholder="Text color" />
+                            <ColorPreview
+                                label={values.label}
+                                color={values.color}
+                                backgroundColor={values.backgroundColor}
+                            />
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">
                             {!dirty && (

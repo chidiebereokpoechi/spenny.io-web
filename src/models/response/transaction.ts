@@ -9,7 +9,7 @@ export interface Transaction {
     type: TransactionType
     amount: number
     date: string
-    every: string
+    every: number
     recurrence_unit: RecurrenceUnit
     categories: Category[]
     created_at: string

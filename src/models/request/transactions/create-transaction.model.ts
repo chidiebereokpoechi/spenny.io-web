@@ -1,0 +1,56 @@
+import { Allow, IsDateString, IsEnum, IsNumber, MinLength, ValidateIf } from 'class-validator'
+import { isBefore } from 'date-fns'
+import { isInteger } from 'lodash'
+import { RecurrenceUnit, TransactionType } from '../../../util/constants'
+import { Satisfies } from '../../../util/validation/decorators'
+import { Tracker } from '../../response'
+import { BaseModel } from '../base.model'
+
+export class CreateTransactionModel extends BaseModel {
+    @MinLength(1)
+    public label: string = ''
+
+    @ValidateIf((o: CreateTransactionModel) => !!o.description)
+    @MinLength(1)
+    public description: string = ''
+
+    @IsEnum(TransactionType)
+    public type: string = ''
+
+    @IsNumber()
+    @Satisfies((value: number) => +value >= 0)
+    public amount: number = 0
+
+    @IsDateString()
+    @Satisfies((value: string) => isBefore(new Date(value), new Date()))
+    public date: string = ''
+
+    @IsNumber()
+    @Satisfies((value: number) => +value >= 1)
+    @Satisfies(isInteger)
+    public every: number = 0
+
+    @IsEnum(RecurrenceUnit)
+    public recurrenceUnit: string = ''
+
+    @IsNumber(undefined, { each: true })
+    @Satisfies((value: number) => +value >= 1, { each: true })
+    @Satisfies(isInteger, { each: true })
+    public categories: number[] = []
+
+    @Allow()
+    public trackerId!: number
+
+    constructor(tracker?: Tracker) {
+        super()
+
+        if (tracker) {
+            this.trackerId = tracker.id
+        }
+    }
+
+    public transform(): void {
+        this.amount = Math.floor(+this.amount)
+        this.every = Math.floor(+this.every)
+    }
+}

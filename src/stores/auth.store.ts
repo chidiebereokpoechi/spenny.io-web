@@ -11,6 +11,7 @@ const API_TOKEN_KEY = 'SPENNY.IO:API_TOKEN'
 
 export class AuthStore implements Resettable {
     public token: string | null = null
+    public loading: boolean = false
     public ready = false
 
     @computed

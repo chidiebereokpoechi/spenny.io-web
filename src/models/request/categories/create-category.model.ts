@@ -3,6 +3,9 @@ import { find } from 'lodash'
 import { stores } from '../../../util/stores'
 import { BaseModel } from '../base.model'
 
+const DEFAULT_BACKGROUND_COLOR = '#334155'
+const DEFAULT_COLOR = '#F8FAFC'
+
 export class CreateCategoryModel extends BaseModel {
     @MinLength(1)
     public label: string = ''
@@ -12,10 +15,10 @@ export class CreateCategoryModel extends BaseModel {
     public description: string = ''
 
     @IsHexColor()
-    public backgroundColor: string = '#334155'
+    public backgroundColor: string = DEFAULT_BACKGROUND_COLOR
 
     @IsHexColor()
-    public color: string = '#F8FAFC'
+    public color: string = DEFAULT_COLOR
 
     public generateCustomValidation() {
         const categories = stores.categoriesStore.categories
