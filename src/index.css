@@ -13,10 +13,10 @@ body {
     font-size: 16px;
 
     @apply text-slate-700;
+    @apply text-xs;
 }
 
 #root {
-    @apply text-xs;
 }
 
 .manrope {
@@ -32,5 +32,5 @@ a {
 }
 
 .heading {
-    @apply font-bold text-black;
+    @apply font-bold;
 }

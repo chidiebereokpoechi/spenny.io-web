@@ -1,5 +1,6 @@
 import { action, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
+import { CreateTrackerModel } from '../models/request'
 import { Tracker } from '../models/response'
 import { HttpMethod } from '../util/constants'
 import { dehydrateToStorage, hydrateFromStorage, removeFromStorage, Resettable } from '../util/misc'
@@ -35,6 +36,23 @@ export class TrackersStore implements Resettable {
 
                     if (response.data) {
                         this.setTrackers(response.data)
+                    }
+                })
+            })
+        )
+    }
+
+    @action
+    public createTracker(model: CreateTrackerModel) {
+        this.loading = true
+
+        return request<CreateTrackerModel, Tracker>('/trackers', HttpMethod.POST, { body: model }).pipe(
+            tap((response) => {
+                runInAction(() => {
+                    this.loading = false
+
+                    if (response.data) {
+                        this.listTrackers().subscribe()
                     }
                 })
             })

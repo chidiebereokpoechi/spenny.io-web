@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion'
 import { observer } from 'mobx-react'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { PrimaryButton } from '../../components/buttons'
 import { DashboardPageWrapper } from '../../components/layout'
+import { CreateTrackerModel } from '../../models/request'
 import { Tracker } from '../../models/response'
 import { useStores } from '../../util/stores'
+import { CreateTrackerModal } from './modals'
 
 const TrackerButton: React.FC<Tracker> = ({ label, description }) => {
     return (
@@ -21,8 +23,13 @@ const TrackerButton: React.FC<Tracker> = ({ label, description }) => {
 }
 
 export const DashboardPage: React.FC = observer(() => {
-    const { user, trackers: trackersStore } = useStores()
+    const { trackers: trackersStore } = useStores()
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const trackers = trackersStore.trackers
+
+    const openModal = useCallback(() => {
+        setIsCreateModalOpen(true)
+    }, [])
 
     useEffect(() => {
         const subscription = trackersStore.listTrackers().subscribe()
@@ -33,10 +40,11 @@ export const DashboardPage: React.FC = observer(() => {
 
     return (
         <DashboardPageWrapper>
+            <CreateTrackerModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
             <header className="p-8 grid grid-cols-1 gap-4">
                 <span className="text-3xl font-extrabold text-black">Trackers</span>
                 <div>
-                    <PrimaryButton type="button">
+                    <PrimaryButton type="button" onClick={openModal}>
                         <span>Create new tracker</span>
                     </PrimaryButton>
                 </div>
