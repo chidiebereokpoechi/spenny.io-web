@@ -28,7 +28,7 @@ export class UserStore implements Resettable {
     public getAuthenticatedUser() {
         this.loading = true
 
-        return request<never, User>('/users/info', HttpMethod.GET).pipe(
+        return request<never, User>('/users/info', HttpMethod.Get).pipe(
             tap((response) => {
                 runInAction(() => {
                     this.loading = false
@@ -47,7 +47,7 @@ export class UserStore implements Resettable {
         dehydrateToStorage(USER_KEY, user)
 
         if (this.user?.trackers) {
-            stores.trackers.setTrackers(this.user.trackers)
+            stores.trackersStore.setTrackers(this.user.trackers)
         }
     }
 

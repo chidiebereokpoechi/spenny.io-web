@@ -3,7 +3,6 @@ import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { PrimaryButton } from '../../components/buttons'
 import { DashboardPageWrapper } from '../../components/layout'
-import { CreateTrackerModel } from '../../models/request'
 import { Tracker } from '../../models/response'
 import { useStores } from '../../util/stores'
 import { CreateTrackerModal } from './modals'
@@ -23,7 +22,7 @@ const TrackerButton: React.FC<Tracker> = ({ label, description }) => {
 }
 
 export const DashboardPage: React.FC = observer(() => {
-    const { trackers: trackersStore } = useStores()
+    const { trackersStore } = useStores()
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const trackers = trackersStore.trackers
 

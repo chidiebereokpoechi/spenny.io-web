@@ -6,7 +6,7 @@ import { ValidationMessage } from '../../layout'
 export interface TextInputProps extends HTMLMotionProps<'input'> {
     name: string
     className?: string
-    label?: string
+    label: string
     errors?: string[]
 }
 
@@ -15,7 +15,7 @@ export const TextInput: React.FC<TextInputProps> = ({ className, label, errors, 
 
     return (
         <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
-            {label && <label className="text-xs text-slate-500">{label}</label>}
+            {props.value && <label className="text-xs text-slate-500">{label}</label>}
             <motion.input
                 className={classNames(
                     'h-10 border-[2px] bg-slate-50 px-5 text-xs rounded-lg',

@@ -1,9 +1,9 @@
 export enum RouteLink {
-    ANY = '*',
-    INDEX = '/',
-    SIGN_UP = '/auth/signup',
-    LOG_IN = '/auth/login',
-    DASHBOARD = '/dashboard',
-    CATEGORIES = '/categories',
-    PROFILE = '/profile',
+    Any = '*',
+    Index = '/',
+    SignUp = '/auth/signup',
+    LogIn = '/auth/login',
+    Dashboard = '/dashboard',
+    Categories = '/categories',
+    Profile = '/profile',
 }

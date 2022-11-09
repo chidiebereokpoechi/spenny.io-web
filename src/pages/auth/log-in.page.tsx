@@ -9,7 +9,7 @@ import { useStores } from '../../util/stores'
 import { validateModel } from '../../util/validation'
 
 export const LogInPage: React.FC = () => {
-    const { auth } = useStores()
+    const { authStore: auth } = useStores()
 
     const onSubmit = useCallback(
         (values: LogInModel, helpers: FormikHelpers<LogInModel>) => {
@@ -36,14 +36,19 @@ export const LogInPage: React.FC = () => {
                             <span>Log into your account</span>
                         </header>
                         <main className="grid grid-cols-1 gap-8">
-                            <FormTextInput name="login" placeholder="Username or email" type="text" />
-                            <FormTextInput name="password" placeholder="Password" type="password" />
+                            <FormTextInput
+                                name="login"
+                                label="Username or password"
+                                placeholder="Username or email"
+                                type="text"
+                            />
+                            <FormTextInput name="password" label="Password" placeholder="Password" type="password" />
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">
                             <PrimaryButton type="submit" className="w-full">
                                 <span>Log in</span>
                             </PrimaryButton>
-                            <Link to={RouteLink.SIGN_UP}>
+                            <Link to={RouteLink.SignUp}>
                                 <span>Sign up instead?</span>
                             </Link>
                         </footer>

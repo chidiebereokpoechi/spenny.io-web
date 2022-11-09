@@ -12,15 +12,15 @@ export const SignUpPage: React.FC = () => {
                     <span>Create your account</span>
                 </header>
                 <main className="grid grid-cols-1 gap-8">
-                    <TextInput name="email" placeholder="Email" />
-                    <TextInput name="username" placeholder="Username" />
-                    <TextInput name="password" placeholder="Password" />
+                    <TextInput name="email" label="Email" placeholder="Email" />
+                    <TextInput name="username" label="Username" placeholder="Username" />
+                    <TextInput name="password" label="Password" placeholder="Password" />
                 </main>
                 <footer className="grid grid-cols-1 gap-4 place-items-center">
                     <PrimaryButton type="submit" className="w-full">
                         <span>Start tracking!</span>
                     </PrimaryButton>
-                    <Link to={RouteLink.LOG_IN}>
+                    <Link to={RouteLink.LogIn}>
                         <span>Already have an account?</span>
                     </Link>
                 </footer>

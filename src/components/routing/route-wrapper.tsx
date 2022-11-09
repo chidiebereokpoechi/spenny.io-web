@@ -13,11 +13,11 @@ interface Props {
 type AuthRequirementResponse = [boolean, RouteLink]
 
 export const AUTH_REQUIREMENTS: Record<AuthRequirement, () => AuthRequirementResponse> = {
-    [AuthRequirement.AUTHENTICATED]() {
-        return [stores.auth.authenticated, RouteLink.LOG_IN] as AuthRequirementResponse
+    [AuthRequirement.Authenticated]() {
+        return [stores.authStore.authenticated, RouteLink.LogIn] as AuthRequirementResponse
     },
-    [AuthRequirement.UNAUTHENTICATED]() {
-        return [!stores.auth.authenticated, RouteLink.DASHBOARD]
+    [AuthRequirement.Unauthenticated]() {
+        return [!stores.authStore.authenticated, RouteLink.Dashboard]
     },
 }
 

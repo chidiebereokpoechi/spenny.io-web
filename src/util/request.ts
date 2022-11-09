@@ -28,7 +28,7 @@ export const request = <M = any, N = null>(
     method: HttpMethod,
     options?: RequestOptions<M>
 ): Observable<Response<N>> => {
-    let token = stores.auth.token
+    let token = stores.authStore.token
 
     const init: RequestInit = {
         method,
@@ -86,7 +86,7 @@ export const request = <M = any, N = null>(
             throw error
         }),
         map((response): Response<N> => {
-            const ok = response.status >= HttpStatusCode.OK && response.status < HttpStatusCode.BAD_REQUEST
+            const ok = response.status >= HttpStatusCode.Ok && response.status < HttpStatusCode.BadRequest
 
             // if (!ok && !options?.silentErrors) {
             //     appState.createMessage(response.response.message ?? 'Error', MessageType.ERROR)

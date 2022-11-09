@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const Router: React.FC<Props> = observer(({ routes }) => {
-    const { auth, user } = useStores()
+    const { authStore: auth, userStore: user } = useStores()
 
     useEffect(() => {
         if (auth.authenticated && !user.user) {

@@ -16,9 +16,6 @@ body {
     @apply text-xs;
 }
 
-#root {
-}
-
 .manrope {
     @apply font-[Manrope];
 }

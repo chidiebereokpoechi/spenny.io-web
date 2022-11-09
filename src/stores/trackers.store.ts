@@ -29,7 +29,7 @@ export class TrackersStore implements Resettable {
     public listTrackers() {
         this.loading = true
 
-        return request<never, Tracker[]>('/trackers', HttpMethod.GET).pipe(
+        return request<never, Tracker[]>('/trackers', HttpMethod.Get).pipe(
             tap((response) => {
                 runInAction(() => {
                     this.loading = false
@@ -46,7 +46,7 @@ export class TrackersStore implements Resettable {
     public createTracker(model: CreateTrackerModel) {
         this.loading = true
 
-        return request<CreateTrackerModel, Tracker>('/trackers', HttpMethod.POST, { body: model }).pipe(
+        return request<CreateTrackerModel, Tracker>('/trackers', HttpMethod.Post, { body: model }).pipe(
             tap((response) => {
                 runInAction(() => {
                     this.loading = false

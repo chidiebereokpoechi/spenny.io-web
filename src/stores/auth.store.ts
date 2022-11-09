@@ -31,12 +31,12 @@ export class AuthStore implements Resettable {
 
     @action
     public logIn(model: LogInModel) {
-        return request<LogInModel, AuthResponse>('/auth', HttpMethod.POST, { body: model }).pipe(
+        return request<LogInModel, AuthResponse>('/auth', HttpMethod.Post, { body: model }).pipe(
             tap((response) => {
                 runInAction(() => {
                     if (response.data) {
                         this.setToken(response.data.token)
-                        stores.user.setUser(response.data.user)
+                        stores.userStore.setUser(response.data.user)
                     }
                 })
             })

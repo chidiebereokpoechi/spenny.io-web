@@ -30,7 +30,7 @@ const SideBarLink: React.FC<SideBarLinkProps> = ({ link, label, onClick }) => {
 }
 
 export const SideBar: React.FC = observer(() => {
-    const { auth } = useStores()
+    const { authStore: auth } = useStores()
 
     const signOut = useCallback(
         (e: any) => {
@@ -43,11 +43,11 @@ export const SideBar: React.FC = observer(() => {
     return (
         <aside className="bg-slate-50 w-48 flex flex-col justify-between">
             <nav className="flex flex-col space-y-4 p-8">
-                <SideBarLink link={RouteLink.DASHBOARD} label="Dashboard" />
-                <SideBarLink link={RouteLink.CATEGORIES} label="Categories" />
+                <SideBarLink link={RouteLink.Dashboard} label="Dashboard" />
+                <SideBarLink link={RouteLink.Categories} label="Categories" />
             </nav>
             <nav className="flex flex-col space-y-4 p-8">
-                <SideBarLink link={RouteLink.PROFILE} label="Profile" />
+                <SideBarLink link={RouteLink.Profile} label="Profile" />
                 <SideBarLink link="#" label="Sign out" onClick={signOut} />
             </nav>
         </aside>
