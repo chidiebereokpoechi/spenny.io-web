@@ -10,6 +10,8 @@ import { validateModel } from '../../../util/validation'
 
 export const CreateTrackerModal: React.FC<ModalProps> = observer((props) => {
     const { trackers: trackersStore } = useStores()
+    const hasTrackers = trackersStore.trackers.length > 0
+    const submitButtonText = hasTrackers ? 'Create tracker' : 'Create first tracker'
     const setIsOpen = props.setIsOpen
 
     const close = useCallback(() => {
@@ -47,7 +49,7 @@ export const CreateTrackerModal: React.FC<ModalProps> = observer((props) => {
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">
                             <PrimaryButton type="submit" className="w-full">
-                                <span>Create tracker</span>
+                                <span>{submitButtonText}</span>
                             </PrimaryButton>
                         </footer>
                     </form>
