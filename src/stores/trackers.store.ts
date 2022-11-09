@@ -1,15 +1,15 @@
 import { action, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
-import { User } from '../models/response'
+import { Tracker } from '../models/response'
 import { HttpMethod } from '../util/constants'
 import { dehydrateToStorage, hydrateFromStorage, removeFromStorage, Resettable } from '../util/misc'
 import { request } from '../util/request'
 import { stores } from '../util/stores'
 
-const USER_KEY = 'SPENNY.IO:USER'
+const TRACKERS_KEY = 'SPENNY.IO:TRACKERS'
 
-export class UserStore implements Resettable {
-    public user!: User | null
+export class TrackersStore implements Resettable {
+    public trackers: Tracker[] = []
     public loading: boolean = false
     public ready: boolean = false
 
@@ -20,21 +20,21 @@ export class UserStore implements Resettable {
 
     @action
     public setUp(): void {
-        this.user = hydrateFromStorage(USER_KEY)
+        this.trackers = hydrateFromStorage(TRACKERS_KEY) ?? []
         this.ready = true
     }
 
     @action
-    public getAuthenticatedUser() {
+    public listTrackers() {
         this.loading = true
 
-        return request<never, User>('/users/info', HttpMethod.GET).pipe(
+        return request<never, Tracker[]>('/trackers', HttpMethod.GET).pipe(
             tap((response) => {
                 runInAction(() => {
                     this.loading = false
 
                     if (response.data) {
-                        this.setUser(response.data)
+                        this.setTrackers(response.data)
                     }
                 })
             })
@@ -42,19 +42,15 @@ export class UserStore implements Resettable {
     }
 
     @action
-    public setUser(user: User): void {
-        this.user = user
-        dehydrateToStorage(USER_KEY, user)
-
-        if (this.user?.trackers) {
-            stores.trackers.setTrackers(this.user.trackers)
-        }
+    public setTrackers(trackers: Tracker[]): void {
+        this.trackers = trackers
+        dehydrateToStorage(TRACKERS_KEY, trackers)
     }
 
     @action
     public reset(): void {
-        this.user = null
-        removeFromStorage(USER_KEY)
+        this.trackers = []
+        removeFromStorage(TRACKERS_KEY)
     }
 
     @action

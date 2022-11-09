@@ -30,3 +30,7 @@ body {
 a {
     @apply font-bold text-primary rounded focus:bg-primary/20 focus:text-primary-dark;
 }
+
+.heading {
+    @apply font-bold text-black;
+}

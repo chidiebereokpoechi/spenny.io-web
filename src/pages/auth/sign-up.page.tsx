@@ -17,7 +17,7 @@ export const SignUpPage: React.FC = () => {
                     <TextInput name="password" placeholder="Password" />
                 </main>
                 <footer className="grid grid-cols-1 gap-4 place-items-center">
-                    <PrimaryButton type="submit">
+                    <PrimaryButton type="submit" className="w-full">
                         <span>Start tracking!</span>
                     </PrimaryButton>
                     <Link to={RouteLink.LOG_IN}>

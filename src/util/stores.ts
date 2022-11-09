@@ -1,10 +1,10 @@
 import { isFunction } from 'formik'
 import { forEach, values } from 'lodash'
-import { AuthStore } from '../stores'
-import { UserStore } from '../stores/user.store'
+import { AuthStore, TrackersStore, UserStore } from '../stores'
 
 type Stores = {
     auth: AuthStore
+    trackers: TrackersStore
     user: UserStore
 
     // Store functions
@@ -13,6 +13,7 @@ type Stores = {
 
 export const stores: Stores = {
     auth: new AuthStore(),
+    trackers: new TrackersStore(),
     user: new UserStore(),
 
     reset(): void {

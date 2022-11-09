@@ -40,7 +40,7 @@ export const LogInPage: React.FC = () => {
                             <FormTextInput name="password" placeholder="Password" type="password" />
                         </main>
                         <footer className="grid grid-cols-1 gap-4 place-items-center">
-                            <PrimaryButton type="submit">
+                            <PrimaryButton type="submit" className="w-full">
                                 <span>Log in</span>
                             </PrimaryButton>
                             <Link to={RouteLink.SIGN_UP}>

@@ -31,10 +31,10 @@ export const PrimaryButton = forwardRef<any, Props>(({ loading, children, classN
     return (
         <motion.button
             className={classNames(
-                'rounded-lg h-10 px-4',
+                'rounded-lg h-10 px-5',
                 loading ? 'bg-black' : 'bg-primary',
                 'hover:bg-primary-dark focus:bg-primary-dark disabled:bg-[#e7e7eb]',
-                'text-white text-xs w-full font-bold',
+                'text-white text-xs inline-flex font-bold justify-center items-center',
                 'outline-none focus:ring-4 ring-primary/20',
                 className
             )}
