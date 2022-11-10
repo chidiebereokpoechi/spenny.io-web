@@ -96,7 +96,7 @@ export const TrackerPage: React.FC = observer(() => {
             )}
             <header className="p-8 grid grid-cols-1 gap-4">
                 <span className="text-3xl font-extrabold text-black">{activeTracker.label}</span>
-                <div className="space-x-4">
+                <div className="flex justify-between space-x-4">
                     <PrimaryButton type="button" onClick={openEditTrackerModal}>
                         <PencilIcon className="h-3" strokeWidth={2} />
                         <span>Edit tracker details</span>
