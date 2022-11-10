@@ -1,8 +1,14 @@
 import { Formik, FormikHelpers } from 'formik'
 import { observer } from 'mobx-react'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { PrimaryButton } from '../../../components/buttons'
-import { FormNumericalInput, FormSelectInput, FormTextAreaInput, FormTextInput } from '../../../components/input'
+import {
+    FormDateInput,
+    FormNumericalInput,
+    FormSelectInput,
+    FormTextAreaInput,
+    FormTextInput,
+} from '../../../components/input'
 import { CenterModal, ModalProps, SideModal } from '../../../components/modals'
 import { CreateTransactionModel } from '../../../models/request'
 import { Tracker } from '../../../models/response'
@@ -10,6 +16,7 @@ import { recurrenceUnitOptions, transactionTypeOptions } from '../../../util/con
 import { formatAsCurrency } from '../../../util/formatting'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
+import Scrollbar from 'react-scrollbars-custom'
 
 interface Props extends ModalProps {
     tracker: Tracker
@@ -17,6 +24,7 @@ interface Props extends ModalProps {
 
 export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...props }) => {
     const { categoriesStore, transactionsStore } = useStores()
+    const [scroller, setScroller] = useState<any>(null)
     const categories = categoriesStore.categories
     const hasTransactions = transactionsStore.transactions.length > 0
     const submitButtonText = hasTransactions ? 'Create transaction' : 'Create first transaction'
@@ -84,11 +92,11 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
                                 placeholder="Amount: eg. 4.99"
                                 precision={2}
                             />
-                            <FormTextInput name="date" label="Date" placeholder="Date: eg. 31/01/1999" type="date" />
+                            <FormDateInput name="date" label="Date" placeholder="Date: eg. 31/01/1999" />
                             <FormNumericalInput
                                 name="every"
                                 label="Every"
-                                placeholder="Every: eg. 1 (how often it recurs)"
+                                placeholder="Every (how often it recurs): eg. 1"
                                 precision={0}
                             />
                             <FormSelectInput

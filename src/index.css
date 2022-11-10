@@ -8,7 +8,6 @@ body {
         'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    color: #38383f;
     font-variant-numeric: tabular-nums;
     font-size: 16px;
 
@@ -30,4 +29,65 @@ a {
 
 .heading {
     @apply font-bold;
+}
+
+.react-datepicker {
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+}
+
+.react-datepicker__header {
+    @apply py-4 bg-slate-50 border-0 border-b-2 border-slate-100;
+}
+
+/* .react-datepicker__current-month {
+    font-size: 10px;
+    font-weight: 400;
+    margin-bottom: 12px;
+} */
+
+.react-datepicker__month-container {
+    width: 100%;
+}
+
+.react-datepicker__week {
+    @apply mb-1;
+}
+
+.react-datepicker__day-names {
+    @apply w-full grid grid-cols-7 gap-2 p-0 px-5;
+}
+
+.react-datepicker__day-name {
+    @apply m-0 text-slate-600 uppercase text-[.5rem] text-center;
+}
+
+.react-datepicker__month {
+    @apply m-0 py-4 grid grid-cols-1 gap-2;
+}
+
+.react-datepicker__week {
+    @apply w-full grid grid-cols-7 gap-2 p-0 px-5;
+}
+
+.react-datepicker__day {
+    @apply text-slate-500 rounded m-0 p-0 hover:bg-slate-100 hover:text-slate-700;
+}
+
+.react-datepicker__day--today {
+    @apply text-primary bg-white font-normal;
+}
+
+.react-datepicker__day--keyboard-selected,
+.react-datepicker__day--selected {
+    @apply text-white bg-primary font-normal;
+}
+
+.react-datepicker__day--disabled {
+    @apply bg-slate-50 text-slate-400 line-through pointer-events-none;
+}
+
+.react-datepicker__day--outside-month {
+    @apply bg-slate-50 text-slate-400 pointer-events-none;
 }

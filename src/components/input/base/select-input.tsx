@@ -1,6 +1,7 @@
 import { Listbox } from '@headlessui/react'
+import { CheckIcon } from '@heroicons/react/24/outline'
 import { isArray } from 'lodash'
-import { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { classNames } from '../../../util/misc'
 import { ValidationMessage } from '../../layout'
 
@@ -105,17 +106,23 @@ export const SelectInput = <T,>({
                         'grid grid-cols-1 items-center border-2 bg-slate-50 text-xs rounded-lg',
                         'outline-none justify-center shadow-lg divide-y-2 divide-slate-100 !ring-0'
                     )}
-                    as="div"
                 >
                     {options.map((option) => (
-                        <Listbox.Option
-                            className="h-10 w-full px-5 py-1 flex items-center ring-inset focus:bg-slate-200 !ring-0 active:bg-slate-200 hover:bg-slate-100"
-                            key={option.value}
-                            value={option.value}
-                            as="button"
-                            type="button"
-                        >
-                            <span>{option.label}</span>
+                        <Listbox.Option as={React.Fragment} key={option.value} value={option.value}>
+                            {({ active, selected, disabled }) => (
+                                <li
+                                    className={classNames(
+                                        disabled && 'cursor-not-allowed pointer-events-none text-slate-300',
+                                        active && (selected ? 'bg-primary-dark' : 'bg-slate-200'),
+                                        selected &&
+                                            'bg-primary text-white focus:bg-primary-dark active:bg-primary-dark hover:!bg-primary-dark',
+                                        'cursor-pointer h-10 w-full px-5 py-1 flex items-center ring-inset !ring-0 hover:bg-slate-100'
+                                    )}
+                                >
+                                    {selected && <CheckIcon className="h-3 mr-2" strokeWidth={2} />}
+                                    <span>{option.label}</span>
+                                </li>
+                            )}
                         </Listbox.Option>
                     ))}
                 </Listbox.Options>

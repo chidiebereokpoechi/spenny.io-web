@@ -1,4 +1,5 @@
 export * from './color-input'
+export * from './date-input'
 export * from './numerical-input'
 export * from './select-input'
 export * from './text-area-input'

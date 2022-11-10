@@ -1,4 +1,4 @@
-import { Allow, IsDateString, IsEnum, IsNumber, IsPositive, MinLength, ValidateIf } from 'class-validator'
+import { Allow, IsDate, IsDateString, IsEnum, IsNumber, IsPositive, MinLength, ValidateIf } from 'class-validator'
 import { clone, isInteger, isNumber } from 'lodash'
 import { RecurrenceUnit, TransactionType } from '../../../util/constants'
 import { Satisfies } from '../../../util/validation/decorators'
@@ -19,8 +19,8 @@ export class CreateTransactionModel extends BaseModel {
     @IsPositive({ message: 'You have to enter a number (greater than 0)' })
     public amount?: number
 
-    @IsDateString(undefined, { message: 'Please provide a valid date' })
-    public date: string = ''
+    @IsDate({ message: 'Please provide a valid date' })
+    public date: Date | null = null
 
     @Satisfies((value: number) => (isNumber(value) ? isInteger(value) : true), { message: 'No fractional values!' })
     @IsPositive({ message: 'You have to enter a number (at least 1)' })
@@ -44,6 +44,7 @@ export class CreateTransactionModel extends BaseModel {
 
     public getRequestBody<CreateTransactionModel>(): CreateTransactionModel {
         const body: any = clone(this)
+        body.date = this.date?.toISOString()
         return body
     }
 }

@@ -9,7 +9,7 @@ export class UpdateTransactionModel extends CreateTransactionModel {
         this.description = transaction.description ?? ''
         this.type = transaction.type
         this.amount = transaction.amount
-        this.date = transaction.date
+        this.date = new Date(transaction.date)
         this.every = transaction.every
         this.recurrenceUnit = transaction.recurrence_unit
         this.categories = map(transaction.categories, 'id')
