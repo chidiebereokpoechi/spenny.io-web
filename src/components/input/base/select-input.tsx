@@ -1,9 +1,10 @@
 import { Listbox } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/24/outline'
 import { isArray } from 'lodash'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { classNames } from '../../../util/misc'
 import { ValidationMessage } from '../../layout'
+import { usePopper } from 'react-popper'
 
 export interface SelectInputProps<T> {
     name: string
@@ -37,6 +38,29 @@ export const SelectInput = <T,>({
 }: React.PropsWithChildren<SelectInputProps<T>>) => {
     const invalid = !!errors?.length
     const showPlaceholder = !value || (isArray(value) && value.length === 0)
+    const [width, setWidth] = useState(0)
+    const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
+    const [popperElement, setPopperElement] = useState<any>(null)
+    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+        strategy: 'fixed',
+        modifiers: [
+            {
+                name: 'preventOverflow',
+            },
+            {
+                name: 'offset',
+                options: {
+                    offset: [0, 8],
+                },
+            },
+            {
+                name: 'flip',
+                options: {
+                    padding: 8,
+                },
+            },
+        ],
+    })
 
     const options = useMemo(() => {
         return optionTypes.map((option) => ({
@@ -61,6 +85,12 @@ export const SelectInput = <T,>({
         },
         [onChange]
     )
+
+    useEffect(() => {
+        if (referenceElement) {
+            setWidth(referenceElement.getBoundingClientRect().width)
+        }
+    }, [referenceElement])
 
     return (
         <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
@@ -87,6 +117,7 @@ export const SelectInput = <T,>({
                         'placeholder:text-slate-400 border-slate-200 overflow-x-hidden'
                     )}
                     type="button"
+                    ref={setReferenceElement}
                 >
                     {showPlaceholder && <span className="text-slate-400">{placeholder}</span>}
                     {!showPlaceholder && multiple && (
@@ -106,6 +137,9 @@ export const SelectInput = <T,>({
                         'grid grid-cols-1 items-center border-2 bg-slate-50 text-xs rounded-lg',
                         'outline-none justify-center shadow-lg divide-y-2 divide-slate-100 !ring-0'
                     )}
+                    ref={setPopperElement}
+                    style={{ ...styles.popper, width }}
+                    {...attributes.popper}
                 >
                     {options.map((option) => (
                         <Listbox.Option as={React.Fragment} key={option.value} value={option.value}>

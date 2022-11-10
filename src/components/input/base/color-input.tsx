@@ -1,11 +1,12 @@
 import { Popover } from '@headlessui/react'
+import React, { useEffect, useState } from 'react'
 import { CirclePicker } from 'react-color'
-import React, { useState } from 'react'
-import { classNames } from '../../../util/misc'
-import { ValidationMessage } from '../../layout'
 import { HexColorPicker } from 'react-colorful'
-import { PrimaryButton } from '../../buttons'
+import { usePopper } from 'react-popper'
 import { Palette } from '../../../util/constants'
+import { classNames } from '../../../util/misc'
+import { PrimaryButton } from '../../buttons'
+import { ValidationMessage } from '../../layout'
 
 export interface ColorInputProps {
     name: string
@@ -37,6 +38,35 @@ export const ColorInput: React.FC<ColorInputProps> = ({
 }) => {
     const invalid = !!errors?.length
     const [isCustom, setIsCustom] = useState(false)
+    const [width, setWidth] = useState(0)
+    const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
+    const [popperElement, setPopperElement] = useState<any>(null)
+    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+        strategy: 'fixed',
+        modifiers: [
+            {
+                name: 'preventOverflow',
+            },
+            {
+                name: 'offset',
+                options: {
+                    offset: [0, 8],
+                },
+            },
+            {
+                name: 'flip',
+                options: {
+                    padding: 8,
+                },
+            },
+        ],
+    })
+
+    useEffect(() => {
+        if (referenceElement) {
+            setWidth(referenceElement.getBoundingClientRect().width)
+        }
+    }, [referenceElement])
 
     return (
         <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
@@ -51,6 +81,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                             : 'hover:border-primary/20 focus:border-primary ring-primary/20',
                         'border-slate-200'
                     )}
+                    ref={setReferenceElement}
                 >
                     {value && (
                         <>
@@ -65,15 +96,18 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                     )}
                     {!value && !!placeholder && <span className="text-slate-400">{placeholder}</span>}
                 </Popover.Button>
-                <Popover.Panel
-                    className={classNames(
-                        'absolute w-full z-10 bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 p-5',
-                        'flex flex-col items-center border-2 bg-slate-50 text-xs rounded-lg space-y-8',
-                        'outline-none justify-center shadow-lg'
-                    )}
-                >
+                <Popover.Panel>
                     {({ close }) => (
-                        <>
+                        <div
+                            className={classNames(
+                                'absolute z-[100] p-5',
+                                'flex flex-col items-center border-2 bg-slate-50 text-xs rounded-lg space-y-8',
+                                'outline-none justify-center shadow-lg'
+                            )}
+                            ref={setPopperElement}
+                            style={{ ...styles.popper, width }}
+                            {...attributes.popper}
+                        >
                             <button
                                 onClick={() => close()}
                                 className="absolute right-2 top-2 text-slate-100 bg-slate-400 focus:bg-slate-600 hover:bg-slate-600 rounded px-4 py-1 font-bold text-[10px]"
@@ -104,10 +138,18 @@ export const ColorInput: React.FC<ColorInputProps> = ({
                                     }}
                                 />
                             )}
-                            <PrimaryButton className="w-full" type="button" onClick={() => setIsCustom((x) => !x)}>
+                            <PrimaryButton
+                                className="w-full"
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    setIsCustom((x) => !x)
+                                }}
+                            >
                                 <span>{isCustom ? 'Choose from presets' : 'Use custom color'}</span>
                             </PrimaryButton>
-                        </>
+                        </div>
                     )}
                 </Popover.Panel>
             </Popover>
