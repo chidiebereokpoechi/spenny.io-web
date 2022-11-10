@@ -2,10 +2,12 @@ import { Formik, FormikHelpers } from 'formik'
 import { observer } from 'mobx-react'
 import React, { useCallback, useEffect } from 'react'
 import { PrimaryButton } from '../../../components/buttons'
-import { FormSelectInput, FormTextAreaInput, FormTextInput } from '../../../components/input'
-import { CenterModal, ModalProps } from '../../../components/modals'
+import { FormNumericalInput, FormSelectInput, FormTextAreaInput, FormTextInput } from '../../../components/input'
+import { CenterModal, ModalProps, SideModal } from '../../../components/modals'
 import { CreateTransactionModel } from '../../../models/request'
 import { Tracker } from '../../../models/response'
+import { recurrenceUnitOptions, transactionTypeOptions } from '../../../util/constants'
+import { formatAsCurrency } from '../../../util/formatting'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
 
@@ -49,30 +51,60 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
     }, [categoriesStore])
 
     return (
-        <CenterModal {...props}>
+        <SideModal {...props}>
             <Formik initialValues={new CreateTransactionModel(tracker)} validate={validateModel} onSubmit={onSubmit}>
                 {({ handleSubmit }) => (
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-[3rem]">
-                        <header className="grid grid-cols-1 gap-4">
+                    <form onSubmit={handleSubmit} className="flex flex-col h-full">
+                        <header className="grid grid-cols-1 gap-4 px-12 pt-12 pb-4">
                             <span className="text-3xl font-extrabold text-black">Create a new transaction</span>
                             <div>
                                 <span>Provide information about your transaction</span>
                             </div>
                         </header>
-                        <main className="grid grid-cols-1 gap-4">
-                            <FormTextInput name="label" label="Label" placeholder="Label: eg. Subscriptions" />
+                        <main className="flex flex-col space-y-4 px-12 py-8 overflow-y-auto flex-1">
+                            <FormTextInput name="label" label="Label" placeholder="Label: eg. Spotify" />
                             <FormTextAreaInput
                                 name="description"
                                 label="Description"
-                                placeholder="Description: eg. Tracking my subscriptions"
+                                placeholder="Description (optional): eg. Music streaming service"
                             />
-                            <FormTextInput name="amount" label="Amount" placeholder="Amount: eg. 4.99" type="number" />
+                            <FormSelectInput
+                                name="type"
+                                label="Type"
+                                placeholder="Transaction type"
+                                options={transactionTypeOptions}
+                                accessor={{
+                                    display: 'display',
+                                    value: 'value',
+                                }}
+                            />
+                            <FormNumericalInput
+                                name="amount"
+                                label="Amount"
+                                placeholder="Amount: eg. 4.99"
+                                precision={2}
+                            />
                             <FormTextInput name="date" label="Date" placeholder="Date: eg. 31/01/1999" type="date" />
-                            <FormTextInput name="every" label="Every" placeholder="Every: eg. 1" type="number" />
+                            <FormNumericalInput
+                                name="every"
+                                label="Every"
+                                placeholder="Every: eg. 1 (how often it recurs)"
+                                precision={0}
+                            />
+                            <FormSelectInput
+                                name="recurrenceUnit"
+                                label="Time unit"
+                                placeholder="Time unit: eg Day, Month"
+                                options={recurrenceUnitOptions}
+                                accessor={{
+                                    display: 'display',
+                                    value: 'value',
+                                }}
+                            />
                             <FormSelectInput
                                 name="categories"
                                 label="Categories"
-                                placeholder="Categories"
+                                placeholder="Categories (can select multiple or none)"
                                 multiple
                                 options={categories}
                                 accessor={{
@@ -81,7 +113,7 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
                                 }}
                             />
                         </main>
-                        <footer className="grid grid-cols-1 gap-4 place-items-center">
+                        <footer className="flex-shrink-0 grid grid-cols-1 gap-4 place-items-center px-12 pb-12 pt-4">
                             <PrimaryButton type="submit" className="w-full">
                                 <span>{submitButtonText}</span>
                             </PrimaryButton>
@@ -89,6 +121,6 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
                     </form>
                 )}
             </Formik>
-        </CenterModal>
+        </SideModal>
     )
 })

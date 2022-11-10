@@ -11,6 +11,7 @@ export interface SelectInputProps<T> {
     errors?: string[]
     placeholder?: string
     onChange?: (...args: any[]) => any
+    onBlur?: (...args: any[]) => any
     value?: any | any[]
     multiple?: boolean
     options: T[]
@@ -27,6 +28,7 @@ export const SelectInput = <T,>({
     errors,
     placeholder,
     onChange,
+    onBlur,
     value,
     multiple,
     options: optionTypes,
@@ -76,19 +78,20 @@ export const SelectInput = <T,>({
             >
                 <Listbox.Button
                     className={classNames(
-                        'flex items-center w-full h-10 border-[2px] bg-slate-50 px-5 text-xs rounded-lg',
+                        'flex items-center w-full py-2.5 border-[2px] bg-slate-50 px-5 text-xs rounded-lg',
                         'outline-none focus:ring-4',
                         invalid
                             ? 'hover:border-red-900/20 focus:border-red-600 ring-red-600/20 text-red-600 placeholder:text-red-400 border-red-200'
                             : 'hover:border-primary/20 focus:border-primary ring-primary/20',
-                        'placeholder:text-slate-400 border-slate-200'
+                        'placeholder:text-slate-400 border-slate-200 overflow-x-hidden'
                     )}
+                    type="button"
                 >
                     {showPlaceholder && <span className="text-slate-400">{placeholder}</span>}
                     {!showPlaceholder && multiple && (
-                        <div className="flex space-x-2 -mx-3">
+                        <div className="flex flex-wrap -mx-2">
                             {(value as any[]).map((selection, i) => (
-                                <span className="bg-slate-200 py-1 px-2 rounded shadow-sm" key={i}>
+                                <span className="bg-slate-200 py-1 px-2 rounded shadow-sm mr-2 mb-2" key={i}>
                                     {optionsMap[selection].label}
                                 </span>
                             ))}
@@ -98,14 +101,21 @@ export const SelectInput = <T,>({
                 </Listbox.Button>
                 <Listbox.Options
                     className={classNames(
-                        'absolute w-full z-10 bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 p-5',
-                        'flex flex-col items-center border-2 bg-slate-50 text-xs rounded-lg',
-                        'outline-none justify-center shadow-lg'
+                        'absolute w-full z-10 bottom-full left-0 transform -translate-y-2 overflow-hidden',
+                        'grid grid-cols-1 items-center border-2 bg-slate-50 text-xs rounded-lg',
+                        'outline-none justify-center shadow-lg divide-y-2 divide-slate-100 !ring-0'
                     )}
+                    as="div"
                 >
                     {options.map((option) => (
-                        <Listbox.Option key={option.value} value={option.value}>
-                            {option.label}
+                        <Listbox.Option
+                            className="h-10 w-full px-5 py-1 flex items-center ring-inset focus:bg-slate-200 !ring-0 active:bg-slate-200 hover:bg-slate-100"
+                            key={option.value}
+                            value={option.value}
+                            as="button"
+                            type="button"
+                        >
+                            <span>{option.label}</span>
                         </Listbox.Option>
                     ))}
                 </Listbox.Options>

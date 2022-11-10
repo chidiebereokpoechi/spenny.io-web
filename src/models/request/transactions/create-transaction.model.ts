@@ -1,6 +1,5 @@
-import { Allow, IsDateString, IsEnum, IsNumber, IsNumberString, MinLength, ValidateIf } from 'class-validator'
-import { isBefore } from 'date-fns'
-import { clone, isInteger } from 'lodash'
+import { Allow, IsDateString, IsEnum, IsNumber, IsPositive, MinLength, ValidateIf } from 'class-validator'
+import { clone, isInteger, isNumber } from 'lodash'
 import { RecurrenceUnit, TransactionType } from '../../../util/constants'
 import { Satisfies } from '../../../util/validation/decorators'
 import { Tracker } from '../../response'
@@ -10,32 +9,29 @@ export class CreateTransactionModel extends BaseModel {
     @MinLength(1, { message: 'You have to provide a label' })
     public label: string = ''
 
-    @ValidateIf((o: CreateTransactionModel) => !!o.description)
     @MinLength(1)
+    @ValidateIf((o: CreateTransactionModel) => !!o.description)
     public description: string = ''
 
-    @IsEnum(TransactionType, { message: 'Invalid transaction type' })
+    @IsEnum(TransactionType, { message: 'Please select a transaction type' })
     public type: string = ''
 
-    @IsNumberString()
-    @Satisfies((value: number) => +value >= 0)
-    public amount: string | number = ''
+    @IsPositive({ message: 'You have to enter a number (greater than 0)' })
+    public amount?: number
 
-    @IsDateString()
-    @Satisfies((value: string) => isBefore(new Date(value), new Date()))
+    @IsDateString(undefined, { message: 'Please provide a valid date' })
     public date: string = ''
 
-    @IsNumber()
-    @Satisfies((value: number) => +value >= 1)
-    @Satisfies(isInteger)
-    public every: number = 0
+    @Satisfies((value: number) => (isNumber(value) ? isInteger(value) : true), { message: 'No fractional values!' })
+    @IsPositive({ message: 'You have to enter a number (at least 1)' })
+    public every?: number
 
-    @IsEnum(RecurrenceUnit)
+    @IsEnum(RecurrenceUnit, { message: 'Please select a time unit' })
     public recurrenceUnit: string = ''
 
-    @IsNumber(undefined, { each: true })
     @Satisfies((value: number) => +value >= 1, { each: true })
     @Satisfies(isInteger, { each: true })
+    @IsNumber(undefined, { each: true })
     public categories: number[] = []
 
     @Allow()
@@ -46,14 +42,8 @@ export class CreateTransactionModel extends BaseModel {
         this.trackerId = tracker.id
     }
 
-    public transform(): void {
-        this.amount = (+this.amount).toFixed(2)
-        this.every = Math.floor(+this.every)
-    }
-
     public getRequestBody<CreateTransactionModel>(): CreateTransactionModel {
         const body: any = clone(this)
-        body.amount = +body.amount
         return body
     }
 }

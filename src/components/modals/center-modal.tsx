@@ -15,10 +15,10 @@ export const CenterModal: React.FC<Props> = ({ children, className, isOpen, setI
     return (
         <Dialog open={isOpen} onClose={close} className="relative z-50 isolate" initialFocus={initialFocus}>
             <div className="fixed inset-0 bg-[#030412]/30" aria-hidden="true" />
-            <div className="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto scroll-my-5 h-screen">
+            <div className="fixed inset-0 flex items-center justify-center overflow-y-auto scroll-my-5 h-screen">
                 <Dialog.Panel
                     className={classNames(
-                        'px-12 py-14 w-full sm:max-w-[25rem] bg-white scroll-py-10 rounded-xl relative shadow-lg grid grid-cols-1 gap-[3rem]',
+                        'px-12 py-14 w-full sm:max-w-[25rem] max-h-screen overflow-y-auto bg-white rounded-xl relative shadow-lg flex flex-col',
                         className
                     )}
                 >

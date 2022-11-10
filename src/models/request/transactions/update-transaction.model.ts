@@ -8,7 +8,7 @@ export class UpdateTransactionModel extends CreateTransactionModel {
         this.label = transaction.label
         this.description = transaction.description ?? ''
         this.type = transaction.type
-        this.amount = transaction.amount.toFixed(2)
+        this.amount = transaction.amount
         this.date = transaction.date
         this.every = transaction.every
         this.recurrenceUnit = transaction.recurrence_unit
