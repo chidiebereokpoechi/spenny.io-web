@@ -11,20 +11,19 @@ import {
     FormTextInput,
 } from '../../../components/input'
 import { ModalProps, SideModal } from '../../../components/modals'
-import { CreateTransactionModel } from '../../../models/request'
-import { Tracker } from '../../../models/response'
+import { UpdateTransactionModel } from '../../../models/request'
+import { Tracker, Transaction } from '../../../models/response'
 import { recurrenceUnitOptions, transactionTypeOptions } from '../../../util/constants'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
 
 interface Props extends ModalProps {
     tracker: Tracker
+    transaction: Transaction
 }
 
-export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...props }) => {
+export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, transaction, ...props }) => {
     const { categoriesStore, transactionsStore } = useStores()
-    const hasTransactions = transactionsStore.transactions.length > 0
-    const submitButtonText = hasTransactions ? 'Create transaction' : 'Create first transaction'
     const setIsOpen = props.setIsOpen
 
     const close = useCallback(() => {
@@ -32,10 +31,10 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
     }, [setIsOpen])
 
     const onSubmit = useCallback(
-        (values: CreateTransactionModel, helpers: FormikHelpers<CreateTransactionModel>) => {
+        (values: UpdateTransactionModel, helpers: FormikHelpers<UpdateTransactionModel>) => {
             helpers.setSubmitting(true)
 
-            transactionsStore.createTransaction(values).subscribe({
+            transactionsStore.updateTransaction(transaction.id, values).subscribe({
                 next(response) {
                     helpers.setSubmitting(false)
 
@@ -45,7 +44,7 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
                 },
             })
         },
-        [transactionsStore, close]
+        [transactionsStore, close, transaction]
     )
 
     useEffect(() => {
@@ -57,13 +56,19 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
 
     return (
         <SideModal {...props}>
-            <Formik initialValues={new CreateTransactionModel(tracker)} validate={validateModel} onSubmit={onSubmit}>
-                {({ handleSubmit }) => (
+            <Formik
+                initialValues={new UpdateTransactionModel(transaction, tracker)}
+                validate={validateModel}
+                onSubmit={onSubmit}
+            >
+                {({ dirty, initialValues, isSubmitting, handleSubmit }) => (
                     <form onSubmit={handleSubmit} className="flex flex-col h-full">
-                        <header className="grid grid-cols-1 gap-4 px-12 pt-12 pb-4">
-                            <span className="text-3xl font-extrabold text-black">Create a new transaction</span>
+                        <header className="grid grid-cols-1 gap-4 overflow-hidden px-12 pt-12 pb-4">
+                            <span className="text-3xl font-extrabold text-black break-words">
+                                Edit {initialValues.label}
+                            </span>
                             <div>
-                                <span>Provide information about your transaction</span>
+                                <span>Update the details of your transaction</span>
                             </div>
                         </header>
                         <main className="flex flex-col space-y-4 px-12 py-8 overflow-y-auto flex-1">
@@ -113,9 +118,16 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
                             />
                         </main>
                         <footer className="flex-shrink-0 grid grid-cols-1 gap-4 place-items-center px-12 pb-12 pt-4">
-                            <PrimaryButton type="submit" className="w-full">
-                                <span>{submitButtonText}</span>
-                            </PrimaryButton>
+                            {!dirty && (
+                                <PrimaryButton type="button" className="w-full cancel" onClick={close}>
+                                    <span>Close</span>
+                                </PrimaryButton>
+                            )}
+                            {dirty && (
+                                <PrimaryButton type="submit" className="w-full" loading={isSubmitting}>
+                                    <span>Save transaction</span>
+                                </PrimaryButton>
+                            )}
                         </footer>
                     </form>
                 )}

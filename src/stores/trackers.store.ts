@@ -92,7 +92,7 @@ export class TrackersStore implements Resettable {
                     this.loading = false
 
                     if (response.data) {
-                        this.retrieveTracker(id)
+                        this.retrieveTracker(id).subscribe()
                     }
                 })
             })

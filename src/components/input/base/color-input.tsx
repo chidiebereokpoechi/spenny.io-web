@@ -42,6 +42,7 @@ export const ColorInput: React.FC<ColorInputProps> = ({
     const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
     const [popperElement, setPopperElement] = useState<any>(null)
     const { styles, attributes } = usePopper(referenceElement, popperElement, {
+        placement: 'top',
         strategy: 'fixed',
         modifiers: [
             {

@@ -1,3 +1,4 @@
+export * from './categories-select-input'
 export * from './color-input'
 export * from './date-input'
 export * from './numerical-input'

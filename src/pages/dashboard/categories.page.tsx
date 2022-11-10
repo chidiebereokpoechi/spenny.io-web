@@ -1,34 +1,10 @@
-import { motion } from 'framer-motion'
 import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { PrimaryButton } from '../../components/buttons'
-import { DashboardPageWrapper } from '../../components/layout'
+import { CategoryButton, DashboardPageWrapper } from '../../components/layout'
 import { Category } from '../../models/response'
 import { useStores } from '../../util/stores'
 import { CreateCategoryModal, UpdateCategoryModal } from './modals'
-
-interface CategoryButtonProps extends Category {
-    onClick: (...args: any[]) => any
-}
-
-const CategoryButton: React.FC<CategoryButtonProps> = ({ label, background_color, color, onClick }) => {
-    return (
-        <motion.div
-            className="bg-white flex-shrink-0 rounded-lg shadow-lg inline-flex flex-col justify-center items-center overflow-hidden mb-6 mr-6 cursor-pointer"
-            style={{
-                background: background_color,
-            }}
-            whileHover={{ scale: 1.025 }}
-            onClick={onClick}
-        >
-            <div className="flex flex-col space-y-1 py-3 px-5">
-                <span className="font-bold" style={{ color }}>
-                    {label}
-                </span>
-            </div>
-        </motion.div>
-    )
-}
 
 export const CategoriesPage: React.FC = observer(() => {
     const { categoriesStore } = useStores()

@@ -1,9 +1,9 @@
-import { action, runInAction } from 'mobx'
+import { action, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
 import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
 import { Transaction } from '../models/response'
 import { HttpMethod } from '../util/constants'
-import { dehydrateToStorage, Resettable } from '../util/misc'
+import { dehydrateToStorage, hydrateFromStorage, Resettable } from '../util/misc'
 import { request } from '../util/request'
 
 const TRANSACTIONS_KEY = 'SPENNY.IO:TRANSACTIONS'
@@ -12,6 +12,17 @@ export class TransactionsStore implements Resettable {
     public transactions: Transaction[] = []
     public loading: boolean = false
     public ready: boolean = false
+
+    constructor() {
+        makeAutoObservable(this, {}, { autoBind: true })
+        this.setUp()
+    }
+
+    @action
+    public setUp(): void {
+        this.transactions = hydrateFromStorage(TRANSACTIONS_KEY) ?? []
+        this.ready = true
+    }
 
     @action
     public createTransaction(model: CreateTransactionModel) {

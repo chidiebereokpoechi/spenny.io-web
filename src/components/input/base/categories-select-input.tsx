@@ -3,10 +3,13 @@ import { CheckIcon } from '@heroicons/react/24/outline'
 import { isArray } from 'lodash'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { classNames } from '../../../util/misc'
-import { ValidationMessage } from '../../layout'
+import { MiniCategoryButton, ValidationMessage } from '../../layout'
 import { usePopper } from 'react-popper'
+import { observer } from 'mobx-react'
+import { useStores } from '../../../util/stores'
+import { Category } from '../../../models/response'
 
-export interface SelectInputProps<T> {
+export interface CategoriesSelectInputProps {
     name: string
     className?: string
     label: string
@@ -15,27 +18,19 @@ export interface SelectInputProps<T> {
     onChange?: (...args: any[]) => any
     onBlur?: (...args: any[]) => any
     value?: any | any[]
-    multiple?: boolean
-    options: T[]
-    accessor: {
-        display: keyof T
-        value: keyof T
-    }
 }
 
-export const SelectInput = <T,>({
+const Input: React.FC<CategoriesSelectInputProps> = ({
     name,
     className,
     label,
     errors,
     placeholder,
     onChange,
-    onBlur,
     value,
-    multiple,
-    options: optionTypes,
-    accessor,
-}: React.PropsWithChildren<SelectInputProps<T>>) => {
+}) => {
+    const { categoriesStore } = useStores()
+    const categories = categoriesStore.categories
     const invalid = !!errors?.length
     const showPlaceholder = !value || (isArray(value) && value.length === 0)
     const [width, setWidth] = useState(0)
@@ -63,22 +58,15 @@ export const SelectInput = <T,>({
         ],
     })
 
-    const options = useMemo(() => {
-        return optionTypes.map((option) => ({
-            label: option[accessor.display] as string,
-            value: option[accessor.value] as any,
-        }))
-    }, [accessor, optionTypes])
+    const categoriesMap = useMemo(() => {
+        const map: Record<number, Category> = {}
 
-    const optionsMap = useMemo(() => {
-        const map: Record<string, typeof options[number]> = {}
-
-        options.forEach((option) => {
-            map[option.value as unknown as string] = option
-        })
+        for (const category of categories) {
+            map[category.id] = category
+        }
 
         return map
-    }, [options])
+    }, [categories])
 
     const select = useCallback(
         (selected: any) => {
@@ -100,37 +88,28 @@ export const SelectInput = <T,>({
                     {label}
                 </label>
             )}
-            <Listbox
-                value={value}
-                onChange={select}
-                multiple={multiple}
-                name={name}
-                as="div"
-                className="flex w-full relative"
-            >
+            <Listbox value={value} onChange={select} multiple name={name} as="div" className="flex w-full relative">
                 <Listbox.Button
                     className={classNames(
                         'flex items-center w-full py-2.5 border-[2px] bg-slate-50 px-5 text-xs rounded-lg',
-                        'outline-none focus:ring-4',
+                        'outline-none focus:ring-4 cursor-pointer',
                         invalid
                             ? 'hover:border-red-900/20 focus:border-red-600 ring-red-600/20 text-red-600 placeholder:text-red-400 border-red-200'
                             : 'hover:border-primary/20 focus:border-primary ring-primary/20',
                         'placeholder:text-slate-400 border-slate-200 overflow-x-hidden'
                     )}
-                    type="button"
+                    as="div"
                     ref={setReferenceElement}
                 >
-                    {showPlaceholder && <span className="text-slate-400">{placeholder}</span>}
-                    {!showPlaceholder && multiple && (
+                    {showPlaceholder ? (
+                        <span className="text-slate-400">{placeholder}</span>
+                    ) : (
                         <div className="flex flex-wrap -mx-2 -mb-2">
-                            {(value as any[]).map((selection, i) => (
-                                <span className="bg-slate-200 py-1 px-2 rounded shadow-sm mr-2 mb-2" key={i}>
-                                    {optionsMap[selection].label}
-                                </span>
+                            {(value as any[]).map((selection) => (
+                                <MiniCategoryButton {...categoriesMap[selection]} key={selection} />
                             ))}
                         </div>
                     )}
-                    {!showPlaceholder && !multiple && <span>{optionsMap[value].label}</span>}
                 </Listbox.Button>
                 <Listbox.Options
                     className={classNames(
@@ -142,8 +121,8 @@ export const SelectInput = <T,>({
                     style={{ ...styles.popper, width }}
                     {...attributes.popper}
                 >
-                    {options.map((option) => (
-                        <Listbox.Option as={React.Fragment} key={option.value} value={option.value}>
+                    {categories.map((category) => (
+                        <Listbox.Option as={React.Fragment} key={category.id} value={category.id}>
                             {({ active, selected, disabled }) => (
                                 <li
                                     className={classNames(
@@ -155,7 +134,7 @@ export const SelectInput = <T,>({
                                     )}
                                 >
                                     {selected && <CheckIcon className="h-3 mr-2" strokeWidth={2} />}
-                                    <span>{option.label}</span>
+                                    <span>{category.label}</span>
                                 </li>
                             )}
                         </Listbox.Option>
@@ -172,3 +151,5 @@ export const SelectInput = <T,>({
         </div>
     )
 }
+
+export const CategoriesSelectInput = observer(Input)

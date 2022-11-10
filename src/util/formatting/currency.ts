@@ -3,7 +3,7 @@ export const formatAsCurrency = (amount?: number | null) => {
         return ''
     }
 
-    return `£ ${amount.toLocaleString('en-GB', {
+    return `£${amount.toLocaleString('en-GB', {
         maximumFractionDigits: 2,
         minimumFractionDigits: 2,
     })}`
