@@ -47,7 +47,7 @@ export const SideBar: React.FC = observer(() => {
                 <SideBarLink link={RouteLink.Categories} label="Categories" />
             </nav>
             <nav className="flex flex-col space-y-4 p-8">
-                <SideBarLink link={RouteLink.Profile} label="Profile" />
+                {/* <SideBarLink link={RouteLink.Profile} label="Profile" /> */}
                 <SideBarLink link="#" label="Sign out" onClick={signOut} />
             </nav>
         </aside>

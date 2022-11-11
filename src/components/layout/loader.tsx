@@ -1,14 +1,16 @@
 import { observer } from 'mobx-react'
 import React from 'react'
+import { classNames } from '../../util/misc'
 
 interface Props {
     loading?: boolean
+    className?: string
     children?: React.ReactNode | React.ReactNode[]
 }
 
-export const Loader: React.FC<Props> = observer(({ loading, children }) => {
+export const Loader: React.FC<Props> = observer(({ className, loading, children }) => {
     return loading ? (
-        <div className="flex w-full h-full bg-slate-100 items-center justify-center">
+        <div className={classNames(className, 'flex w-full h-full bg-slate-100 items-center justify-center')}>
             <svg
                 aria-hidden="true"
                 className="w-10 h-10 text-slate-300 animate-spin fill-primary"

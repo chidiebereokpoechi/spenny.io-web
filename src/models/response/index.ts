@@ -1,5 +1,6 @@
 export * from './auth-response'
 export * from './category'
+export * from './computed-transaction'
 export * from './tracker'
 export * from './transaction'
 export * from './user'

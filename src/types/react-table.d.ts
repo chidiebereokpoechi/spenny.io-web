@@ -68,9 +68,13 @@ declare module 'react-table' {
             // feature set, this is a safe default.
             Record<string, any> {}
 
-    export interface Hooks<D extends object = {}> extends UseExpandedHooks<D>, UseGroupByHooks<D>, UseRowSelectHooks<D>, UseSortByHooks<D> {}
+    export interface Hooks<D extends object = Record<string, never>>
+        extends UseExpandedHooks<D>,
+            UseGroupByHooks<D>,
+            UseRowSelectHooks<D>,
+            UseSortByHooks<D> {}
 
-    export interface TableInstance<D extends object = {}>
+    export interface TableInstance<D extends object = Record<string, never>>
         extends UseColumnOrderInstanceProps<D>,
             UseExpandedInstanceProps<D>,
             UseFiltersInstanceProps<D>,
@@ -81,7 +85,7 @@ declare module 'react-table' {
             UseRowStateInstanceProps<D>,
             UseSortByInstanceProps<D> {}
 
-    export interface TableState<D extends object = {}>
+    export interface TableState<D extends object = Record<string, never>>
         extends UseColumnOrderState<D>,
             UseExpandedState<D>,
             UseFiltersState<D>,
@@ -93,23 +97,27 @@ declare module 'react-table' {
             UseRowStateState<D>,
             UseSortByState<D> {}
 
-    export interface Column<D extends object = {}>
+    export interface Column<D extends object = Record<string, never>>
         extends UseFiltersColumnOptions<D>,
             UseGlobalFiltersColumnOptions<D>,
             UseGroupByColumnOptions<D>,
             UseResizeColumnsColumnOptions<D>,
-            UseSortByColumnOptions<D> {}
+            UseSortByColumnOptions<D> {
+        aggregate?(): any
+    }
 
-    export interface ColumnInstance<D extends object = {}>
+    export interface ColumnInstance<D extends object = Record<string, never>>
         extends UseFiltersColumnProps<D>,
             UseGroupByColumnProps<D>,
             UseResizeColumnsColumnProps<D>,
             UseSortByColumnProps<D>,
             Record<string, any> {}
 
-    export interface Cell<D extends object = {}> extends UseGroupByCellProps<D>, UseRowStateCellProps<D> {}
+    export interface Cell<D extends object = Record<string, never>>
+        extends UseGroupByCellProps<D>,
+            UseRowStateCellProps<D> {}
 
-    export interface Row<D extends object = {}>
+    export interface Row<D extends object = Record<string, never>>
         extends UseExpandedRowProps<D>,
             UseGroupByRowProps<D>,
             UseRowSelectRowProps<D>,

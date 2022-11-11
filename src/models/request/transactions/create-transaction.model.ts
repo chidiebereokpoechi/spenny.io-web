@@ -1,4 +1,4 @@
-import { Allow, IsDate, IsDateString, IsEnum, IsNumber, IsPositive, MinLength, ValidateIf } from 'class-validator'
+import { Allow, IsDate, IsEnum, IsNumber, IsPositive, MinLength, ValidateIf } from 'class-validator'
 import { clone, isInteger, isNumber } from 'lodash'
 import { RecurrenceUnit, TransactionType } from '../../../util/constants'
 import { Satisfies } from '../../../util/validation/decorators'
@@ -10,7 +10,7 @@ export class CreateTransactionModel extends BaseModel {
     public label: string = ''
 
     @MinLength(1)
-    @ValidateIf((o: CreateTransactionModel) => !!o.description)
+    @ValidateIf((o: CreateTransactionModel) => !!o.description, { message: 'You need a description' })
     public description: string = ''
 
     @IsEnum(TransactionType, { message: 'Please select a transaction type' })

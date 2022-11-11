@@ -1,4 +1,5 @@
 import { Option } from '../misc'
+import { WordVariants } from '../misc/word-variants'
 
 export enum RecurrenceUnit {
     Day = 'day',
@@ -27,3 +28,30 @@ export const recurrenceUnitOptions: Option[] = [
         value: RecurrenceUnit.Year,
     },
 ]
+
+interface Variants extends WordVariants {
+    period: string
+}
+
+export const recurrenceUnitWordVariantMap: Record<RecurrenceUnit, Variants> = {
+    [RecurrenceUnit.Day]: {
+        singular: 'day',
+        plural: 'days',
+        period: 'daily',
+    },
+    [RecurrenceUnit.Week]: {
+        singular: 'week',
+        plural: 'weeks',
+        period: 'weekly',
+    },
+    [RecurrenceUnit.Month]: {
+        singular: 'month',
+        plural: 'months',
+        period: 'monthly',
+    },
+    [RecurrenceUnit.Year]: {
+        singular: 'year',
+        plural: 'years',
+        period: 'yearly',
+    },
+}
