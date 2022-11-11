@@ -7,7 +7,7 @@ interface Props {
 
 export const Loader: React.FC<Props> = ({ loading, children }) => {
     return loading ? (
-        <div className="flex w-full h-full bg-slate-200 items-center justify-center">
+        <div className="flex w-full h-full bg-slate-100 items-center justify-center">
             <svg
                 aria-hidden="true"
                 className="w-10 h-10 text-slate-300 animate-spin fill-primary"

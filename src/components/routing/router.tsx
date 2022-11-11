@@ -29,11 +29,13 @@ export const Router: React.FC<Props> = observer(({ routes }) => {
                                 key={`${i}${j}`}
                                 path={path}
                                 element={
-                                    <RouteWrapper
-                                        title={title}
-                                        component={component}
-                                        authRequirements={authRequirements}
-                                    />
+                                    <Loader loading={auth.loading}>
+                                        <RouteWrapper
+                                            title={title}
+                                            component={component}
+                                            authRequirements={authRequirements}
+                                        />
+                                    </Loader>
                                 }
                             />
                         )

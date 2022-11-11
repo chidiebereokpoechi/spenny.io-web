@@ -8,6 +8,7 @@ import { usePopper } from 'react-popper'
 import { observer } from 'mobx-react'
 import { useStores } from '../../../util/stores'
 import { Category } from '../../../models/response'
+import { PrimaryButton } from '../../buttons'
 
 export interface CategoriesSelectInputProps {
     name: string
@@ -17,7 +18,8 @@ export interface CategoriesSelectInputProps {
     placeholder?: string
     onChange?: (...args: any[]) => any
     onBlur?: (...args: any[]) => any
-    value?: any | any[]
+    value?: number[]
+    createCategory?: (...args: any[]) => any
 }
 
 const Input: React.FC<CategoriesSelectInputProps> = ({
@@ -28,6 +30,7 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
     placeholder,
     onChange,
     value,
+    createCategory,
 }) => {
     const { categoriesStore } = useStores()
     const categories = categoriesStore.categories
@@ -69,10 +72,17 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
     }, [categories])
 
     const select = useCallback(
-        (selected: any) => {
+        (selected?: number[]) => {
             return onChange?.(selected)
         },
         [onChange]
+    )
+
+    const addToSelection = useCallback(
+        (category: Category) => {
+            select(value?.concat(category.id))
+        },
+        [select, value]
     )
 
     useEffect(() => {
@@ -121,24 +131,33 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
                     style={{ ...styles.popper, width }}
                     {...attributes.popper}
                 >
-                    {categories.map((category) => (
-                        <Listbox.Option as={React.Fragment} key={category.id} value={category.id}>
-                            {({ active, selected, disabled }) => (
-                                <li
-                                    className={classNames(
-                                        disabled && 'cursor-not-allowed pointer-events-none text-slate-300',
-                                        active && (selected ? 'bg-primary-dark' : 'bg-slate-200'),
-                                        selected &&
-                                            'bg-primary text-white focus:bg-primary-dark active:bg-primary-dark hover:!bg-primary-dark',
-                                        'cursor-pointer h-10 w-full px-5 py-1 flex items-center ring-inset !ring-0 hover:bg-slate-100'
-                                    )}
-                                >
-                                    {selected && <CheckIcon className="h-3 mr-2" strokeWidth={2} />}
-                                    <span>{category.label}</span>
-                                </li>
-                            )}
-                        </Listbox.Option>
-                    ))}
+                    {categories.length === 0 ? (
+                        <div className="p-3 flex flex-col space-y-2 items-center">
+                            <span>You have no categories</span>
+                            <PrimaryButton className="w-full">
+                                <span>Create your first category!</span>
+                            </PrimaryButton>
+                        </div>
+                    ) : (
+                        categories.map((category) => (
+                            <Listbox.Option as={React.Fragment} key={category.id} value={category.id}>
+                                {({ active, selected, disabled }) => (
+                                    <li
+                                        className={classNames(
+                                            disabled && 'cursor-not-allowed pointer-events-none text-slate-300',
+                                            active && (selected ? 'bg-primary-dark' : 'bg-slate-200'),
+                                            selected &&
+                                                'bg-primary text-white focus:bg-primary-dark active:bg-primary-dark hover:!bg-primary-dark',
+                                            'cursor-pointer h-10 w-full px-5 py-1 flex items-center ring-inset !ring-0 hover:bg-slate-100'
+                                        )}
+                                    >
+                                        {selected && <CheckIcon className="h-3 mr-2" strokeWidth={2} />}
+                                        <span>{category.label}</span>
+                                    </li>
+                                )}
+                            </Listbox.Option>
+                        ))
+                    )}
                 </Listbox.Options>
             </Listbox>
             {invalid && (
