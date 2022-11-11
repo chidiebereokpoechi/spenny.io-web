@@ -12,9 +12,10 @@ import { ColorPreview } from '../components'
 
 interface Props extends ModalProps {
     category: Category
+    onSave?: (category: Category) => void
 }
 
-export const UpdateCategoryModal: React.FC<Props> = observer(({ category, ...props }) => {
+export const UpdateCategoryModal: React.FC<Props> = observer(({ category, onSave, ...props }) => {
     const { categoriesStore } = useStores()
     const setIsOpen = props.setIsOpen
 
@@ -31,12 +32,13 @@ export const UpdateCategoryModal: React.FC<Props> = observer(({ category, ...pro
                     helpers.setSubmitting(false)
 
                     if (response.data) {
+                        onSave?.(response.data)
                         close()
                     }
                 },
             })
         },
-        [categoriesStore, close, category]
+        [categoriesStore, close, category, onSave]
     )
 
     return (

@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Route as RouteDefinition } from '../../pages/routes'
 import { useStores } from '../../util/stores'
+import { Loader } from '../layout'
 import { RouteWrapper } from './route-wrapper'
 
 interface Props {
@@ -28,11 +29,13 @@ export const Router: React.FC<Props> = observer(({ routes }) => {
                                 key={`${i}${j}`}
                                 path={path}
                                 element={
-                                    <RouteWrapper
-                                        title={title}
-                                        component={component}
-                                        authRequirements={authRequirements}
-                                    />
+                                    <Loader loading={auth.loading}>
+                                        <RouteWrapper
+                                            title={title}
+                                            component={component}
+                                            authRequirements={authRequirements}
+                                        />
+                                    </Loader>
                                 }
                             />
                         )
@@ -40,5 +43,7 @@ export const Router: React.FC<Props> = observer(({ routes }) => {
                 })}
             </Routes>
         </BrowserRouter>
-    ) : null
+    ) : (
+        <Loader />
+    )
 })

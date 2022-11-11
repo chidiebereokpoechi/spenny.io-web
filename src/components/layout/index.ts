@@ -1,5 +1,6 @@
 export * from './category-button'
 export * from './dashboard-page'
+export * from './loader'
 export * from './mini-category-button'
 export * from './modal'
 export * from './validation-message'

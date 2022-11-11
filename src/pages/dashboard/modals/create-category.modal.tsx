@@ -5,11 +5,16 @@ import { PrimaryButton } from '../../../components/buttons'
 import { FormColorInput, FormTextAreaInput, FormTextInput } from '../../../components/input'
 import { CenterModal, ModalProps } from '../../../components/modals'
 import { CreateCategoryModel } from '../../../models/request'
+import { Category } from '../../../models/response'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
 import { ColorPreview } from '../components'
 
-export const CreateCategoryModal: React.FC<ModalProps> = observer((props) => {
+interface Props extends ModalProps {
+    onCreate?: (category: Category) => void
+}
+
+export const CreateCategoryModal: React.FC<Props> = observer(({ onCreate, ...props }) => {
     const { categoriesStore } = useStores()
     const hasCategories = categoriesStore.categories.length > 0
     const submitButtonText = hasCategories ? 'Create category' : 'Create first category'
@@ -28,12 +33,13 @@ export const CreateCategoryModal: React.FC<ModalProps> = observer((props) => {
                     helpers.setSubmitting(false)
 
                     if (response.data) {
+                        onCreate?.(response.data)
                         close()
                     }
                 },
             })
         },
-        [categoriesStore, close]
+        [categoriesStore, close, onCreate]
     )
 
     return (
