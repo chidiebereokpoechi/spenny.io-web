@@ -27,6 +27,7 @@ export class CategoriesStore implements Resettable {
 
     @action
     public listCategories() {
+        this.categories = []
         this.loading = true
 
         return request<never, Category[]>('/categories', HttpMethod.Get).pipe(
@@ -85,6 +86,8 @@ export class CategoriesStore implements Resettable {
     @action
     public reset(): void {
         this.categories = []
+        this.loading = false
+        this.ready = false
         removeFromStorage(CATEGORIES_KEY)
     }
 

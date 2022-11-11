@@ -31,7 +31,6 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
     placeholder,
     onChange,
     value,
-    createCategory,
 }) => {
     const [isCreateCategoriesModalOpen, setIsCreateCategoriesModalOpen] = useState(false)
     const { categoriesStore } = useStores()
@@ -43,7 +42,6 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
     const [popperElement, setPopperElement] = useState<any>(null)
     const { styles, attributes } = usePopper(referenceElement, popperElement, {
         placement: 'top',
-        strategy: 'fixed',
         modifiers: [
             {
                 name: 'preventOverflow',
@@ -99,7 +97,11 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
 
     return (
         <>
-            <CreateCategoryModal isOpen={isCreateCategoriesModalOpen} setIsOpen={setIsCreateCategoriesModalOpen} />
+            <CreateCategoryModal
+                isOpen={isCreateCategoriesModalOpen}
+                setIsOpen={setIsCreateCategoriesModalOpen}
+                onCreate={addToSelection}
+            />
             <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
                 <div className="flex justify-between">
                     {showPlaceholder ? (
@@ -156,7 +158,7 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
                         {categories.length === 0 ? (
                             <div className="p-3 flex flex-col space-y-2 items-center">
                                 <span>You have no categories</span>
-                                <PrimaryButton className="w-full">
+                                <PrimaryButton className="w-full" onClick={openCreateCategoriesModal} type="button">
                                     <span>Create your first category!</span>
                                 </PrimaryButton>
                             </div>

@@ -1,4 +1,5 @@
 import { PencilIcon, PlusIcon } from '@heroicons/react/24/solid'
+import { DateTime } from 'luxon'
 import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
@@ -21,6 +22,8 @@ export const TrackerPage: React.FC = observer(() => {
     const transactions = transactionsStore.transactions
     const hasTransactions = transactions.length > 0
     const activeTracker = trackersStore.activeTracker
+    const trackersLoading = trackersStore.loading
+    const transactionsLoading = transactionsStore.loading
     const ready = trackersStore.ready
     const [activeCategory, setActiveCategory] = useState<Category | null>(null)
     const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null)
@@ -63,13 +66,16 @@ export const TrackerPage: React.FC = observer(() => {
         }
     }, [ready, activeTracker, transactionsStore])
 
-    return activeTracker ? (
+    return (
         <DashboardPageWrapper>
             {activeCategory && (
                 <UpdateCategoryModal
                     isOpen={isEditCategoryModalOpen}
                     setIsOpen={setIsEditCategoryModalOpen}
                     category={activeCategory}
+                    onSave={() => {
+                        transactionsStore.listTransactionsForTracker(activeTracker!.id).subscribe()
+                    }}
                 />
             )}
             {activeTracker && (
@@ -94,9 +100,9 @@ export const TrackerPage: React.FC = observer(() => {
                     )}
                 </>
             )}
-            <Loader loading={trackersStore.loading}>
+            <Loader loading={trackersLoading}>
                 <header className="p-8 grid grid-cols-1 gap-4">
-                    <span className="text-3xl font-extrabold text-black">{activeTracker.label}</span>
+                    <span className="text-3xl font-extrabold text-black">{activeTracker?.label}</span>
                     <div className="flex justify-between space-x-4">
                         <PrimaryButton type="button" onClick={openEditTrackerModal}>
                             <PencilIcon className="h-3" strokeWidth={2} />
@@ -110,7 +116,7 @@ export const TrackerPage: React.FC = observer(() => {
                         )}
                     </div>
                 </header>
-                <Loader loading={transactionsStore.loading}>
+                <Loader loading={transactionsLoading}>
                     {hasTransactions ? (
                         <main className="flex-1 overflow-y-auto">
                             <BasicTable
@@ -178,6 +184,10 @@ export const TrackerPage: React.FC = observer(() => {
                                     {
                                         Header: 'Date',
                                         accessor: 'date',
+                                        Cell({ cell }: CellProps<Transaction>) {
+                                            const { date } = cellValue(cell)
+                                            return <span>{DateTime.fromISO(date).toFormat('dd MMMM yyyy')}</span>
+                                        },
                                     },
                                     {
                                         Header: 'Every',
@@ -205,5 +215,5 @@ export const TrackerPage: React.FC = observer(() => {
                 </Loader>
             </Loader>
         </DashboardPageWrapper>
-    ) : null
+    )
 })

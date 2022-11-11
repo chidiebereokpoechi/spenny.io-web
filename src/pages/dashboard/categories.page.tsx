@@ -12,6 +12,7 @@ export const CategoriesPage: React.FC = observer(() => {
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
     const [activeCategory, setActiveCategory] = useState<Category | null>(null)
     const categories = categoriesStore.categories
+    const categoriesLoading = categoriesStore.loading
 
     const openModal = useCallback(() => {
         setIsCreateModalOpen(true)
@@ -33,7 +34,7 @@ export const CategoriesPage: React.FC = observer(() => {
 
     return (
         <DashboardPageWrapper>
-            <Loader loading={categoriesStore.loading}>
+            <Loader loading={categoriesLoading}>
                 {activeCategory && (
                     <UpdateCategoryModal
                         isOpen={isUpdateModalOpen}

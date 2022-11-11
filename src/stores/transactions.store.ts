@@ -64,6 +64,7 @@ export class TransactionsStore implements Resettable {
 
     @action
     public listTransactionsForTracker(trackerId: number) {
+        this.transactions = []
         this.ready = false
         this.loading = true
 

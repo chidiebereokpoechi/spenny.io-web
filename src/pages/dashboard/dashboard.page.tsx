@@ -29,6 +29,7 @@ export const DashboardPage: React.FC = observer(() => {
     const { trackersStore } = useStores()
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const trackers = trackersStore.trackers
+    const trackersLoading = trackersStore.loading
 
     const openModal = useCallback(() => {
         setIsCreateModalOpen(true)
@@ -43,7 +44,7 @@ export const DashboardPage: React.FC = observer(() => {
 
     return (
         <DashboardPageWrapper>
-            <Loader loading={trackersStore.loading}>
+            <Loader loading={trackersLoading}>
                 <CreateTrackerModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
                 {trackers.length > 0 ? (
                     <>

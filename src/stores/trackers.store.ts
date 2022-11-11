@@ -29,6 +29,7 @@ export class TrackersStore implements Resettable {
 
     @action
     public listTrackers() {
+        this.trackers = []
         this.loading = true
 
         return request<never, Tracker[]>('/trackers', HttpMethod.Get).pipe(
@@ -46,6 +47,7 @@ export class TrackersStore implements Resettable {
 
     @action
     public retrieveTracker(id: number) {
+        this.activeTracker = null
         this.ready = false
         this.loading = true
 

@@ -27,6 +27,7 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
     const hasTransactions = transactionsStore.transactions.length > 0
     const submitButtonText = hasTransactions ? 'Create transaction' : 'Create first transaction'
     const setIsOpen = props.setIsOpen
+    const categoriesLoading = categoriesStore.loading
 
     const close = useCallback(() => {
         setIsOpen(false)
@@ -60,7 +61,7 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
         <SideModal {...props}>
             <Formik initialValues={new CreateTransactionModel(tracker)} validate={validateModel} onSubmit={onSubmit}>
                 {({ handleSubmit }) => (
-                    <Loader loading={categoriesStore.loading}>
+                    <Loader loading={categoriesLoading}>
                         <form onSubmit={handleSubmit} className="flex flex-col h-full">
                             <header className="grid grid-cols-1 gap-4 px-12 pt-12 pb-4">
                                 <span className="text-3xl font-extrabold text-black">Create a new transaction</span>

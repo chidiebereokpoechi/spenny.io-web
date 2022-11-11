@@ -26,6 +26,7 @@ interface Props extends ModalProps {
 export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, transaction, ...props }) => {
     const { categoriesStore, transactionsStore } = useStores()
     const setIsOpen = props.setIsOpen
+    const categoriesLoading = categoriesStore.loading
 
     const close = useCallback(() => {
         setIsOpen(false)
@@ -63,7 +64,7 @@ export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, tran
                 onSubmit={onSubmit}
             >
                 {({ dirty, initialValues, isSubmitting, handleSubmit }) => (
-                    <Loader loading={categoriesStore.loading}>
+                    <Loader loading={categoriesLoading}>
                         <form onSubmit={handleSubmit} className="flex flex-col h-full">
                             <header className="grid grid-cols-1 gap-4 overflow-hidden px-12 pt-12 pb-4">
                                 <span className="text-3xl font-extrabold text-black break-words">

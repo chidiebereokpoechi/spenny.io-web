@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react'
 import React from 'react'
 
 interface Props {
@@ -5,7 +6,7 @@ interface Props {
     children?: React.ReactNode | React.ReactNode[]
 }
 
-export const Loader: React.FC<Props> = ({ loading, children }) => {
+export const Loader: React.FC<Props> = observer(({ loading, children }) => {
     return loading ? (
         <div className="flex w-full h-full bg-slate-100 items-center justify-center">
             <svg
@@ -28,4 +29,4 @@ export const Loader: React.FC<Props> = ({ loading, children }) => {
     ) : (
         <>{children}</>
     )
-}
+})
