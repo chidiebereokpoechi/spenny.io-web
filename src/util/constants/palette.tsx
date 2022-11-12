@@ -73,5 +73,6 @@ export class Palette {
         '#0f172a',
     ]
 
+    public static readonly GreenSea: string[] = ['#dcd8cc', '#e3c8ad', '#94c1ba', '#57ae9e', '#268573']
     public static readonly Primary: string[] = ['#6e24ff', '#3600a3']
 }

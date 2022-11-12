@@ -1,4 +1,4 @@
-import { ArrowLongDownIcon, ArrowLongUpIcon } from '@heroicons/react/24/outline'
+import { ArrowLongDownIcon, ArrowLongUpIcon, ArrowsUpDownIcon } from '@heroicons/react/24/outline'
 import React from 'react'
 import { Column, TableInstance, TableOptions, usePagination, useSortBy, useTable } from 'react-table'
 import { classNames } from '../../util/misc'
@@ -31,7 +31,7 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
         )
 
     return (
-        <div className="h-full overflow-auto bg-slate-100 border-2 border-slate-300 w-full">
+        <div className="h-full overflow-auto bg-slate-100 w-full">
             <table className="border-spacing-0 border-collapse w-full" {...getTableProps()}>
                 {/* THEAD */}
                 <thead className="w-full">
@@ -48,15 +48,20 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
                                             'px-5 m-0 text-left'
                                         )}
                                     >
-                                        <div className="flex space-x-2 items-center">
+                                        <div className="flex flex-shrink-0 space-x-2 justify-between items-center">
                                             <span>{column.render('Header')}</span>
                                             {column.isSorted ? (
                                                 column.isSortedDesc ? (
-                                                    <ArrowLongDownIcon className="h-3" strokeWidth={2} />
+                                                    <ArrowLongDownIcon className="!h-3 flex-shrink-0" strokeWidth={2} />
                                                 ) : (
-                                                    <ArrowLongUpIcon className="h-3" strokeWidth={2} />
+                                                    <ArrowLongUpIcon className="!h-3 flex-shrink-0" strokeWidth={2} />
                                                 )
-                                            ) : null}
+                                            ) : (
+                                                <ArrowsUpDownIcon
+                                                    className="!h-3 flex-shrink-0 text-slate-300"
+                                                    strokeWidth={2}
+                                                />
+                                            )}
                                         </div>
                                         {/* {!isLast && (
                                             <div
@@ -85,7 +90,7 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
                                             key={j}
                                             className={classNames(
                                                 'px-5 m-0 text-left bg-slate-50',
-                                                'border-b-2 border-slate-300/50 border-r-2 font-normal text-[11px] text-accent-2 py-3 last:pr-8 last:border-r-0'
+                                                'border-b-2 border-slate-300/50 border-r-2 font-normal text-[11px] text-accent-2 py-3 first:pl-8 last:pr-8 last:border-r-0'
                                             )}
                                         >
                                             {cell.render('Cell')}

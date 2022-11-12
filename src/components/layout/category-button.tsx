@@ -28,7 +28,7 @@ export const CategoryButton: React.FC<CategoryButtonProps> = ({
             type="button"
         >
             <div className="flex flex-col space-y-1 py-3 px-5">
-                <span className="font-bold" style={{ color }}>
+                <span className="font-bold text-left" style={{ color }}>
                     {label}
                 </span>
             </div>

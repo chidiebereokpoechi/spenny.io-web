@@ -122,10 +122,7 @@ export const TrackerPage: React.FC = observer(() => {
                 </header>
                 <Loader loading={transactionsLoading}>
                     {hasTransactions ? (
-                        <main
-                            className="flex-1 w-full overflow-auto px-8 pb-8 relative"
-                            style={{ width: dimensions.width }}
-                        >
+                        <main className="flex-1 w-full overflow-auto relative" style={{ width: dimensions.width }}>
                             <BasicTable
                                 columns={[
                                     {
@@ -140,10 +137,12 @@ export const TrackerPage: React.FC = observer(() => {
                                                     <div className="flex flex-col space-y-2">
                                                         <div>
                                                             <button
-                                                                className="inline-flex py-1 px-2 bg-slate-600 rounded"
+                                                                className="inline-flex justify-start py-1 px-2 bg-slate-600 rounded"
                                                                 onClick={openTransaction(transaction.transaction)}
                                                             >
-                                                                <span className="font-[500] text-white">{label}</span>
+                                                                <span className="font-[500] text-left text-white">
+                                                                    {label}
+                                                                </span>
                                                             </button>
                                                         </div>
                                                         {description && (
@@ -197,6 +196,7 @@ export const TrackerPage: React.FC = observer(() => {
                                     },
                                     {
                                         Header: 'Categories',
+                                        accessor: 'categoriesValue',
                                         Cell({ cell }: CellProps<ComputedTransaction>) {
                                             const { categories } = cellValue(cell)
                                             return (
@@ -222,6 +222,7 @@ export const TrackerPage: React.FC = observer(() => {
                                     },
                                     {
                                         Header: 'Recurrence',
+                                        accessor: 'recurrenceValue',
                                         Cell({ cell }: CellProps<ComputedTransaction>) {
                                             const { recurs } = cellValue(cell)
                                             return <span className="whitespace-pre">{recurs}</span>

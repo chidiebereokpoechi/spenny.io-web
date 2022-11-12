@@ -24,6 +24,7 @@ const defaultColors: string[] = [
     ...Palette.PinkFoam,
     ...Palette.BlueToRed,
     ...Palette.Slate,
+    ...Palette.GreenSea,
     ...Palette.Primary,
 ]
 

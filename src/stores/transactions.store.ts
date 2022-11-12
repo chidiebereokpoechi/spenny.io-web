@@ -1,6 +1,6 @@
 import { addDays, addMonths, addWeeks, addYears, isSameMonth } from 'date-fns'
-import { capitalize, map } from 'lodash'
-import { DateTime } from 'luxon'
+import { capitalize, map, orderBy } from 'lodash'
+import { DateTime, Duration } from 'luxon'
 import { action, computed, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
 import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
@@ -62,19 +62,22 @@ export class TransactionsStore implements Resettable {
         const nextPaymentFormatted = DateTime.fromJSDate(nextPaymentDate).toFormat('dd MMMM yyyy')
         const sameMonth = isSameMonth(new Date(), nextPaymentDate)
         const dueThisMonth = sameMonth ? transaction.amount : 0
+        const sortedCategories = orderBy(transaction.categories, 'label')
 
         return {
             label: transaction.label,
             description: transaction.description,
-            categories: transaction.categories,
+            categories: sortedCategories,
+            categoriesValue: map(sortedCategories, 'label.0').join(''),
             type: transaction.type,
             amount: transaction.amount,
             date: transaction.date,
             recurs: this.describeRecurrence(transaction.every, unit),
+            recurrenceValue: Duration.fromObject({ [unit]: transaction.every }).toMillis(),
             nextPayment: nextPaymentDate.toISOString(),
             nextPaymentFormatted: nextPaymentFormatted,
             dueThisMonth,
-            paid: sameMonth,
+            paid: dueThisMonth === 0,
             transaction,
         }
     }

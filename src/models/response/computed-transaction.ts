@@ -5,9 +5,11 @@ export interface ComputedTransaction {
     description: Transaction['description']
     type: Transaction['type']
     categories: Transaction['categories']
+    categoriesValue: string
     amount: number
     date: string
     recurs: string
+    recurrenceValue: number
     nextPayment: string
     nextPaymentFormatted: string
     dueThisMonth: number
