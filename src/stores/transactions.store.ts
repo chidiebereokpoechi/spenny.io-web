@@ -5,7 +5,7 @@ import { action, computed, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
 import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
 import { ComputedTransaction, Transaction } from '../models/response'
-import { HttpMethod, RecurrenceUnit, recurrenceUnitWordVariantMap } from '../util/constants'
+import { HttpMethod, RecurrenceUnit, recurrenceUnitWordVariantMap, TransactionType } from '../util/constants'
 import { dehydrateToStorage, hydrateFromStorage, Resettable } from '../util/misc'
 import { request } from '../util/request'
 
@@ -61,7 +61,7 @@ export class TransactionsStore implements Resettable {
         const nextPaymentDate = addFunction(dateOfPurchase.toJSDate(), transaction.every * multiplier)
         const nextPaymentFormatted = DateTime.fromJSDate(nextPaymentDate).toFormat('dd MMMM yyyy')
         const sameMonth = isSameMonth(new Date(), nextPaymentDate)
-        const dueThisMonth = sameMonth ? transaction.amount : 0
+        const dueThisMonth = transaction.type === TransactionType.Expense && sameMonth ? transaction.amount : 0
         const sortedCategories = orderBy(transaction.categories, 'label')
 
         return {

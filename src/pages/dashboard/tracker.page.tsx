@@ -1,5 +1,5 @@
 import { PencilIcon, PlusIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { every, map, sum } from 'lodash'
+import { every, filter, map, sum } from 'lodash'
 import { DateTime } from 'luxon'
 import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -9,7 +9,7 @@ import { PrimaryButton } from '../../components/buttons'
 import { DashboardPageWrapper, Loader, MiniCategoryButton } from '../../components/layout'
 import { BasicTable } from '../../components/tables'
 import { Category, ComputedTransaction, Transaction } from '../../models/response'
-import { transactionTypeLabelMap } from '../../util/constants'
+import { TransactionType, transactionTypeLabelMap } from '../../util/constants'
 import { cellValue, classNames } from '../../util/misc'
 import useDimensions from '../../util/misc/dimensions'
 import { useStores } from '../../util/stores'
@@ -185,11 +185,29 @@ export const TrackerPage: React.FC = observer(() => {
                                             )
                                         },
                                         Footer({ rows }) {
-                                            const total = sum(map(rows, 'original.amount'))
+                                            const transactions = map(rows, 'original')
+                                            const expenses = filter(transactions, { type: TransactionType.Expense })
+                                            const income = filter(transactions, { type: TransactionType.Income })
+
+                                            const totalExpenses = sum(map(expenses, 'amount'))
+                                            const totalIncome = sum(map(income, 'amount'))
+                                            const net = totalIncome - totalExpenses
+
                                             return (
-                                                <div className="flex justify-between">
-                                                    <span>£</span>
-                                                    <span>{total.toFixed(2)}</span>
+                                                <div className="flex flex-col space-y-2">
+                                                    <div className="flex justify-between">
+                                                        <span className="mr-2">£ (+)</span>
+                                                        <span>{totalIncome.toFixed(2)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="mr-2">£ (-)</span>
+                                                        <span>{totalExpenses.toFixed(2)}</span>
+                                                    </div>
+                                                    <hr />
+                                                    <div className="flex justify-between">
+                                                        <span className="mr-2">£</span>
+                                                        <span>{net.toFixed(2)}</span>
+                                                    </div>
                                                 </div>
                                             )
                                         },
