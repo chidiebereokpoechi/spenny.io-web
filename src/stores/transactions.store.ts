@@ -33,7 +33,7 @@ export class TransactionsStore implements Resettable {
             return capitalize(variants.period)
         }
 
-        return `${amount} ${variants.plural}`
+        return `Every ${amount} ${variants.plural}`
     }
 
     private getAddDateFunction(unit: RecurrenceUnit) {
@@ -52,12 +52,12 @@ export class TransactionsStore implements Resettable {
     private transformTransaction(transaction: Transaction): ComputedTransaction {
         const unit = transaction.recurrence_unit
         const dateOfPurchase = DateTime.fromISO(transaction.date)
-        const timeSincePurchase = DateTime.fromMillis(Date.now()).diff(dateOfPurchase, unit, {
+        const durationSincePurchase = DateTime.fromMillis(Date.now()).diff(dateOfPurchase, unit, {
             conversionAccuracy: 'longterm',
         })
 
         const addFunction = this.getAddDateFunction(unit)
-        const multiplier = Math.ceil(timeSincePurchase.as(transaction.recurrence_unit))
+        const multiplier = Math.ceil(durationSincePurchase.as(transaction.recurrence_unit) / transaction.every)
         const nextPaymentDate = addFunction(dateOfPurchase.toJSDate(), transaction.every * multiplier)
         const nextPaymentFormatted = DateTime.fromJSDate(nextPaymentDate).toFormat('dd MMMM yyyy')
         const sameMonth = isSameMonth(new Date(), nextPaymentDate)
