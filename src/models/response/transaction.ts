@@ -1,4 +1,4 @@
-import { RecurrenceUnit, TransactionType } from '../../util/constants'
+import { RecurrenceUnit, TransactionStatus, TransactionType } from '../../util/constants'
 import { Category } from './category'
 
 export interface Transaction {
@@ -6,6 +6,7 @@ export interface Transaction {
     label: string
     description: string | null
     image_url: string | null
+    status: TransactionStatus
     type: TransactionType
     amount: number
     date: string

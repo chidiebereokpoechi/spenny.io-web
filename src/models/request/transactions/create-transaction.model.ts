@@ -1,6 +1,6 @@
 import { Allow, IsDate, IsEnum, IsNumber, IsPositive, MinLength, ValidateIf } from 'class-validator'
 import { clone, isInteger, isNumber } from 'lodash'
-import { RecurrenceUnit, TransactionType } from '../../../util/constants'
+import { RecurrenceUnit, TransactionStatus, TransactionType } from '../../../util/constants'
 import { Satisfies } from '../../../util/validation/decorators'
 import { Tracker } from '../../response'
 import { BaseModel } from '../base.model'
@@ -15,6 +15,9 @@ export class CreateTransactionModel extends BaseModel {
 
     @IsEnum(TransactionType, { message: 'Please select a transaction type' })
     public type: string = ''
+
+    @IsEnum(TransactionStatus, { message: 'Please select a transaction status' })
+    public status: string = ''
 
     @IsPositive({ message: 'You have to enter a number (greater than 0)' })
     public amount?: number

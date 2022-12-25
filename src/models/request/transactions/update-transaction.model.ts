@@ -8,6 +8,7 @@ export class UpdateTransactionModel extends CreateTransactionModel {
         this.label = transaction.label
         this.description = transaction.description ?? ''
         this.type = transaction.type
+        this.status = transaction.status
         this.amount = transaction.amount
         this.date = new Date(transaction.date)
         this.every = transaction.every

@@ -1,5 +1,5 @@
 import { addDays, addMonths, addWeeks, addYears, isSameMonth } from 'date-fns'
-import { capitalize, map, orderBy } from 'lodash'
+import { capitalize, map, orderBy, remove } from 'lodash'
 import { DateTime, Duration } from 'luxon'
 import { action, computed, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
@@ -19,6 +19,14 @@ export class TransactionsStore implements Resettable {
     @computed
     public get computedTransactions(): ComputedTransaction[] {
         return map(this.transactions, this.transformTransaction)
+    }
+
+    @computed
+    public get aggregates() {
+        // TODO: remove stub
+        return {
+            total: 100,
+        }
     }
 
     constructor() {
@@ -63,12 +71,14 @@ export class TransactionsStore implements Resettable {
         const sameMonth = isSameMonth(new Date(), nextPaymentDate)
         const dueThisMonth = transaction.type === TransactionType.Expense && sameMonth ? transaction.amount : 0
         const sortedCategories = orderBy(transaction.categories, 'label')
+        const estimatedMonthly = transaction.amount / Duration.fromObject({ [unit]: transaction.every }).as('months')
 
         return {
             label: transaction.label,
             description: transaction.description,
             categories: sortedCategories,
             categoriesValue: map(sortedCategories, 'label.0').join(''),
+            status: transaction.status,
             type: transaction.type,
             amount: transaction.amount,
             date: transaction.date,
@@ -76,6 +86,7 @@ export class TransactionsStore implements Resettable {
             recurrenceValue: Duration.fromObject({ [unit]: transaction.every }).toMillis(),
             nextPayment: nextPaymentDate.toISOString(),
             nextPaymentFormatted: nextPaymentFormatted,
+            estimatedMonthly,
             dueThisMonth,
             paid: dueThisMonth === 0,
             transaction,
@@ -120,6 +131,23 @@ export class TransactionsStore implements Resettable {
 
                     if (response.data) {
                         this.listTransactionsForTracker(model.trackerId).subscribe()
+                    }
+                })
+            })
+        )
+    }
+
+    @action
+    public deleteTransaction(id: number) {
+        this.loading = true
+
+        return request<never>(`/transactions/${id}`, HttpMethod.Delete, {}).pipe(
+            tap((response) => {
+                runInAction(() => {
+                    this.loading = false
+
+                    if (response.ok) {
+                        remove(this.transactions, { id })
                     }
                 })
             })

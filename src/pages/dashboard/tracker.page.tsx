@@ -1,6 +1,5 @@
-import { PencilIcon, PlusIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { CheckIcon, PencilIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { every, filter, map, sum } from 'lodash'
-import { DateTime } from 'luxon'
 import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
@@ -9,7 +8,7 @@ import { PrimaryButton } from '../../components/buttons'
 import { DashboardPageWrapper, Loader, MiniCategoryButton } from '../../components/layout'
 import { BasicTable } from '../../components/tables'
 import { Category, ComputedTransaction, Transaction } from '../../models/response'
-import { TransactionType, transactionTypeLabelMap } from '../../util/constants'
+import { transactionStatusLabelMap, TransactionType, transactionTypeLabelMap } from '../../util/constants'
 import { cellValue, classNames } from '../../util/misc'
 import useDimensions from '../../util/misc/dimensions'
 import { useStores } from '../../util/stores'
@@ -130,7 +129,7 @@ export const TrackerPage: React.FC = observer(() => {
                                         accessor: 'label',
                                         Cell({ cell }: CellProps<ComputedTransaction>) {
                                             const transaction = cellValue(cell)
-                                            const { label, description } = transaction
+                                            const { label } = transaction
 
                                             return (
                                                 <div className="flex justify-between space-x-4">
@@ -145,9 +144,6 @@ export const TrackerPage: React.FC = observer(() => {
                                                                 </span>
                                                             </button>
                                                         </div>
-                                                        {description && (
-                                                            <span className="whitespace-pre-wrap">{description}</span>
-                                                        )}
                                                     </div>
                                                 </div>
                                             )
@@ -168,6 +164,43 @@ export const TrackerPage: React.FC = observer(() => {
                                                     <span className="font-[500]" style={{ color }}>
                                                         {text}
                                                     </span>
+                                                </div>
+                                            )
+                                        },
+                                    },
+                                    {
+                                        Header: 'Status',
+                                        accessor: 'status',
+                                        Cell({ cell }: CellProps<ComputedTransaction>) {
+                                            const { status } = cellValue(cell)
+                                            const { backgroundColor, color, text } = transactionStatusLabelMap[status]
+
+                                            return (
+                                                <div
+                                                    className="inline-flex py-1 px-2 rounded"
+                                                    style={{ backgroundColor }}
+                                                >
+                                                    <span className="font-[500]" style={{ color }}>
+                                                        {text}
+                                                    </span>
+                                                </div>
+                                            )
+                                        },
+                                    },
+                                    {
+                                        Header: 'Categories',
+                                        accessor: 'categoriesValue',
+                                        Cell({ cell }: CellProps<ComputedTransaction>) {
+                                            const { categories } = cellValue(cell)
+                                            return (
+                                                <div className="flex flex-wrap -mb-2">
+                                                    {categories.map((category, i) => (
+                                                        <MiniCategoryButton
+                                                            key={i}
+                                                            {...category}
+                                                            onClick={openCategory(category)}
+                                                        />
+                                                    ))}
                                                 </div>
                                             )
                                         },
@@ -195,11 +228,11 @@ export const TrackerPage: React.FC = observer(() => {
 
                                             return (
                                                 <div className="flex flex-col space-y-2">
-                                                    <div className="flex justify-between">
+                                                    <div className="flex justify-between flex-nowrap whitespace-nowrap">
                                                         <span className="mr-2">£ (+)</span>
                                                         <span>{totalIncome.toFixed(2)}</span>
                                                     </div>
-                                                    <div className="flex justify-between">
+                                                    <div className="flex justify-between flex-nowrap whitespace-nowrap">
                                                         <span className="mr-2">£ (-)</span>
                                                         <span>{totalExpenses.toFixed(2)}</span>
                                                     </div>
@@ -213,29 +246,43 @@ export const TrackerPage: React.FC = observer(() => {
                                         },
                                     },
                                     {
-                                        Header: 'Categories',
-                                        accessor: 'categoriesValue',
+                                        Header: 'Estimated monthly',
+                                        accessor: 'estimatedMonthly',
                                         Cell({ cell }: CellProps<ComputedTransaction>) {
-                                            const { categories } = cellValue(cell)
+                                            const transaction = cellValue(cell)
                                             return (
-                                                <div className="flex flex-wrap -mb-2">
-                                                    {categories.map((category, i) => (
-                                                        <MiniCategoryButton
-                                                            key={i}
-                                                            {...category}
-                                                            onClick={openCategory(category)}
-                                                        />
-                                                    ))}
+                                                <div className="flex justify-between">
+                                                    <span>£</span>
+                                                    <span>{transaction.estimatedMonthly.toFixed(2)}</span>
                                                 </div>
                                             )
                                         },
-                                    },
-                                    {
-                                        Header: 'Purchase date',
-                                        accessor: 'date',
-                                        Cell({ cell }: CellProps<ComputedTransaction>) {
-                                            const { date } = cellValue(cell)
-                                            return <span>{DateTime.fromISO(date).toFormat('dd MMMM yyyy')}</span>
+                                        Footer({ rows }) {
+                                            const transactions = map(rows, 'original')
+                                            const expenses = filter(transactions, { type: TransactionType.Expense })
+                                            const income = filter(transactions, { type: TransactionType.Income })
+
+                                            const totalExpenses = sum(map(expenses, 'estimatedMonthly'))
+                                            const totalIncome = sum(map(income, 'estimatedMonthly'))
+                                            const net = totalIncome - totalExpenses
+
+                                            return (
+                                                <div className="flex flex-col space-y-2">
+                                                    <div className="flex justify-between flex-nowrap whitespace-nowrap">
+                                                        <span className="mr-2">£ (+)</span>
+                                                        <span>{totalIncome.toFixed(2)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between flex-nowrap whitespace-nowrap">
+                                                        <span className="mr-2">£ (-)</span>
+                                                        <span>{totalExpenses.toFixed(2)}</span>
+                                                    </div>
+                                                    <hr />
+                                                    <div className="flex justify-between">
+                                                        <span className="mr-2">£</span>
+                                                        <span>{net.toFixed(2)}</span>
+                                                    </div>
+                                                </div>
+                                            )
                                         },
                                     },
                                     {

@@ -1,6 +1,6 @@
 import { Formik, FormikHelpers } from 'formik'
 import { observer } from 'mobx-react'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { PrimaryButton } from '../../../components/buttons'
 import {
     FormCategoriesSelectInput,
@@ -14,7 +14,7 @@ import { Loader } from '../../../components/layout'
 import { ModalProps, SideModal } from '../../../components/modals'
 import { UpdateTransactionModel } from '../../../models/request'
 import { Tracker, Transaction } from '../../../models/response'
-import { recurrenceUnitOptions, transactionTypeOptions } from '../../../util/constants'
+import { recurrenceUnitOptions, transactionStatusOptions, transactionTypeOptions } from '../../../util/constants'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
 
@@ -27,10 +27,25 @@ export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, tran
     const { categoriesStore, transactionsStore } = useStores()
     const setIsOpen = props.setIsOpen
     const categoriesLoading = categoriesStore.loading
+    const [isLoading, setIsLoading] = useState(false)
 
     const close = useCallback(() => {
         setIsOpen(false)
     }, [setIsOpen])
+
+    const deleteTransaction = useCallback(() => {
+        setIsLoading(true)
+
+        transactionsStore.deleteTransaction(transaction.id).subscribe({
+            next(response) {
+                setIsLoading(false)
+
+                if (response.ok) {
+                    close()
+                }
+            },
+        })
+    }, [transactionsStore, setIsLoading, close, transaction])
 
     const onSubmit = useCallback(
         (values: UpdateTransactionModel, helpers: FormikHelpers<UpdateTransactionModel>) => {
@@ -64,14 +79,23 @@ export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, tran
                 onSubmit={onSubmit}
             >
                 {({ dirty, initialValues, isSubmitting, handleSubmit }) => (
-                    <Loader loading={categoriesLoading}>
+                    <Loader loading={categoriesLoading || isLoading}>
                         <form onSubmit={handleSubmit} className="flex flex-col h-full">
                             <header className="grid grid-cols-1 gap-4 overflow-hidden px-12 pt-12 pb-4">
                                 <span className="text-3xl font-extrabold text-black break-words">
                                     Edit {initialValues.label}
                                 </span>
-                                <div>
+                                <div className="flex flex-col">
                                     <span>Update the details of your transaction</span>
+                                    <div className="mt-2">
+                                        <button
+                                            type="button"
+                                            className="text-red-600 inline-flex"
+                                            onClick={deleteTransaction}
+                                        >
+                                            <span>Delete?</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </header>
                             <main className="flex flex-col space-y-4 px-12 py-8 overflow-y-auto flex-1">
@@ -86,6 +110,16 @@ export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, tran
                                     label="Type"
                                     placeholder="Transaction type"
                                     options={transactionTypeOptions}
+                                    accessor={{
+                                        display: 'display',
+                                        value: 'value',
+                                    }}
+                                />
+                                <FormSelectInput
+                                    name="status"
+                                    label="Status"
+                                    placeholder="Transaction status"
+                                    options={transactionStatusOptions}
                                     accessor={{
                                         display: 'display',
                                         value: 'value',

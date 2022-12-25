@@ -14,7 +14,7 @@ import { Loader } from '../../../components/layout'
 import { ModalProps, SideModal } from '../../../components/modals'
 import { CreateTransactionModel } from '../../../models/request'
 import { Tracker } from '../../../models/response'
-import { recurrenceUnitOptions, transactionTypeOptions } from '../../../util/constants'
+import { recurrenceUnitOptions, transactionStatusOptions, transactionTypeOptions } from '../../../util/constants'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
 
@@ -81,6 +81,16 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
                                     label="Type"
                                     placeholder="Transaction type"
                                     options={transactionTypeOptions}
+                                    accessor={{
+                                        display: 'display',
+                                        value: 'value',
+                                    }}
+                                />
+                                <FormSelectInput
+                                    name="status"
+                                    label="Status"
+                                    placeholder="Transaction status"
+                                    options={transactionStatusOptions}
                                     accessor={{
                                         display: 'display',
                                         value: 'value',
