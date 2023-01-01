@@ -1,5 +1,5 @@
-import { CheckIcon, PencilIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { every, filter, map, sum } from 'lodash'
+import { CheckIcon, PencilIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { every, map } from 'lodash'
 import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
@@ -7,11 +7,12 @@ import { CellProps } from 'react-table'
 import { PrimaryButton } from '../../components/buttons'
 import { DashboardPageWrapper, Loader, MiniCategoryButton } from '../../components/layout'
 import { BasicTable } from '../../components/tables'
-import { Category, ComputedTransaction, Transaction } from '../../models/response'
-import { transactionStatusLabelMap, TransactionType, transactionTypeLabelMap } from '../../util/constants'
+import { Category, ComputedTransaction, Transaction, TransactionAggregate } from '../../models/response'
+import { transactionStatusLabelMap, transactionTypeLabelMap } from '../../util/constants'
 import { cellValue, classNames } from '../../util/misc'
 import useDimensions from '../../util/misc/dimensions'
 import { useStores } from '../../util/stores'
+import { NetAmount } from './components'
 import { CreateTransactionModal, UpdateCategoryModal, UpdateTrackerModal, UpdateTransactionModal } from './modals'
 
 export const TrackerPage: React.FC = observer(() => {
@@ -22,8 +23,9 @@ export const TrackerPage: React.FC = observer(() => {
     const [isCreateTransactionModalOpen, setIsCreateTransactionModalOpen] = useState(false)
     const [isEditTransactionModalOpen, setIsEditTransactionModalOpen] = useState(false)
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false)
-    const transactions = transactionsStore.computedTransactions
-    const hasTransactions = transactions.length > 0
+    const aggregate = transactionsStore.aggregate
+    const transactions = aggregate?.transactions
+    const hasTransactions = !!transactions?.length
     const activeTracker = trackersStore.activeTracker
     const trackersLoading = trackersStore.loading
     const transactionsLoading = transactionsStore.loading
@@ -217,32 +219,11 @@ export const TrackerPage: React.FC = observer(() => {
                                                 </div>
                                             )
                                         },
-                                        Footer({ rows }) {
-                                            const transactions = map(rows, 'original')
-                                            const expenses = filter(transactions, { type: TransactionType.Expense })
-                                            const income = filter(transactions, { type: TransactionType.Income })
+                                        Footer() {
+                                            const [income, expenses, net] = (aggregate as TransactionAggregate)
+                                                .totalAmount
 
-                                            const totalExpenses = sum(map(expenses, 'amount'))
-                                            const totalIncome = sum(map(income, 'amount'))
-                                            const net = totalIncome - totalExpenses
-
-                                            return (
-                                                <div className="flex flex-col space-y-2">
-                                                    <div className="flex justify-between flex-nowrap whitespace-nowrap">
-                                                        <span className="mr-2">£ (+)</span>
-                                                        <span>{totalIncome.toFixed(2)}</span>
-                                                    </div>
-                                                    <div className="flex justify-between flex-nowrap whitespace-nowrap">
-                                                        <span className="mr-2">£ (-)</span>
-                                                        <span>{totalExpenses.toFixed(2)}</span>
-                                                    </div>
-                                                    <hr />
-                                                    <div className="flex justify-between">
-                                                        <span className="mr-2">£</span>
-                                                        <span>{net.toFixed(2)}</span>
-                                                    </div>
-                                                </div>
-                                            )
+                                            return <NetAmount {...{ income, expenses, net }} />
                                         },
                                     },
                                     {
@@ -257,32 +238,11 @@ export const TrackerPage: React.FC = observer(() => {
                                                 </div>
                                             )
                                         },
-                                        Footer({ rows }) {
-                                            const transactions = map(rows, 'original')
-                                            const expenses = filter(transactions, { type: TransactionType.Expense })
-                                            const income = filter(transactions, { type: TransactionType.Income })
+                                        Footer() {
+                                            const [income, expenses, net] = (aggregate as TransactionAggregate)
+                                                .totalEstimatedMonthly
 
-                                            const totalExpenses = sum(map(expenses, 'estimatedMonthly'))
-                                            const totalIncome = sum(map(income, 'estimatedMonthly'))
-                                            const net = totalIncome - totalExpenses
-
-                                            return (
-                                                <div className="flex flex-col space-y-2">
-                                                    <div className="flex justify-between flex-nowrap whitespace-nowrap">
-                                                        <span className="mr-2">£ (+)</span>
-                                                        <span>{totalIncome.toFixed(2)}</span>
-                                                    </div>
-                                                    <div className="flex justify-between flex-nowrap whitespace-nowrap">
-                                                        <span className="mr-2">£ (-)</span>
-                                                        <span>{totalExpenses.toFixed(2)}</span>
-                                                    </div>
-                                                    <hr />
-                                                    <div className="flex justify-between">
-                                                        <span className="mr-2">£</span>
-                                                        <span>{net.toFixed(2)}</span>
-                                                    </div>
-                                                </div>
-                                            )
+                                            return <NetAmount {...{ income, expenses, net }} />
                                         },
                                     },
                                     {
@@ -313,12 +273,12 @@ export const TrackerPage: React.FC = observer(() => {
                                                 </div>
                                             )
                                         },
-                                        Footer({ rows }) {
-                                            const total = sum(map(rows, 'original.dueThisMonth'))
+                                        Footer() {
+                                            const total = aggregate?.dueThisMonth
                                             return (
                                                 <div className="flex justify-between">
                                                     <span>£</span>
-                                                    <span>{total.toFixed(2)}</span>
+                                                    <span>{total?.toFixed(2)}</span>
                                                 </div>
                                             )
                                         },
