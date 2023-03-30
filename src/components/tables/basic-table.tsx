@@ -112,8 +112,7 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
                                     <td
                                         {...column.getFooterProps()}
                                         className={classNames(
-                                            column.isSorted ? 'bg-slate-200' : 'bg-slate-100',
-                                            'px-5 m-0 text-left shadow-md',
+                                            'bg-slate-100 px-5 m-0 text-left shadow-md',
                                             'border-slate-300/50 border-r-2 font-normal text-[11px] text-accent-2 sticky bottom-0 py-3 last:pr-8 last:border-r-0'
                                         )}
                                     >

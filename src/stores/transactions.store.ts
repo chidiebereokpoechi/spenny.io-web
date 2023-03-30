@@ -5,7 +5,7 @@ import { action, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
 import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
 import { ComputedTransaction, Transaction, TransactionAggregate } from '../models/response'
-import { HttpMethod, TransactionType } from '../util/constants'
+import { HttpMethod, TransactionStatus, TransactionType } from '../util/constants'
 import { dehydrateToStorage, hydrateFromStorage, Resettable } from '../util/misc'
 import { request } from '../util/request'
 import { describeRecurrence, getAddDateFunction } from '../util/time'
@@ -24,7 +24,7 @@ export class TransactionsStore implements Resettable {
     }
 
     private getAggregate(): TransactionAggregate {
-        const transactions = map(this.transactions, this.transformTransaction)
+        const transactions = map(this.transactions, this.processTransaction)
         const expenses = filter(transactions, { type: TransactionType.Expense })
         const income = filter(transactions, { type: TransactionType.Income })
 
@@ -49,12 +49,18 @@ export class TransactionsStore implements Resettable {
         return aggregate
     }
 
-    private transformTransaction(transaction: Transaction): ComputedTransaction {
+    private fallbackIfInactive<T>(isActive: boolean, valueIfActive: T, valueIfInactive: T): T {
+        return isActive ? valueIfActive : valueIfInactive
+    }
+
+    private processTransaction(transaction: Transaction): ComputedTransaction {
         const unit = transaction.recurrence_unit
         const dateOfPurchase = DateTime.fromISO(transaction.date)
         const durationSincePurchase = DateTime.fromMillis(Date.now()).diff(dateOfPurchase, unit, {
             conversionAccuracy: 'longterm',
         })
+
+        const isActive = transaction.status === TransactionStatus.Active
 
         const addFunction = getAddDateFunction(unit)
         const multiplier = Math.ceil(durationSincePurchase.as(transaction.recurrence_unit) / transaction.every)
@@ -78,9 +84,9 @@ export class TransactionsStore implements Resettable {
             recurrenceValue: Duration.fromObject({ [unit]: transaction.every }).toMillis(),
             nextPayment: nextPaymentDate.toISOString(),
             nextPaymentFormatted: nextPaymentFormatted,
-            estimatedMonthly,
-            dueThisMonth,
-            paid: dueThisMonth === 0,
+            estimatedMonthly: this.fallbackIfInactive(isActive, estimatedMonthly, 0),
+            dueThisMonth: this.fallbackIfInactive(isActive, dueThisMonth, 0),
+            paid: this.fallbackIfInactive(isActive, dueThisMonth === 0, true),
             transaction,
         }
     }
