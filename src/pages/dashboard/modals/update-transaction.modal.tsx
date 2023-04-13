@@ -24,9 +24,11 @@ interface Props extends ModalProps {
 }
 
 export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, transaction, ...props }) => {
-    const { categoriesStore, transactionsStore } = useStores()
+    const { categoriesStore, transactionsStore, walletsStore } = useStores()
     const setIsOpen = props.setIsOpen
     const categoriesLoading = categoriesStore.loading
+    const walletsLoading = walletsStore.loading
+    const wallets = walletsStore.wallets
     const [isLoading, setIsLoading] = useState(false)
 
     const close = useCallback(() => {
@@ -79,7 +81,7 @@ export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, tran
                 onSubmit={onSubmit}
             >
                 {({ dirty, initialValues, isSubmitting, handleSubmit }) => (
-                    <Loader loading={categoriesLoading || isLoading}>
+                    <Loader loading={categoriesLoading || walletsLoading || isLoading}>
                         <form onSubmit={handleSubmit} className="flex flex-col h-full">
                             <header className="grid grid-cols-1 gap-4 overflow-hidden px-12 pt-12 pb-4">
                                 <span className="text-3xl font-extrabold text-black break-words">
@@ -104,6 +106,16 @@ export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, tran
                                     name="description"
                                     label="Description"
                                     placeholder="Description (optional): eg. Music streaming service"
+                                />
+                                <FormSelectInput
+                                    name="walletId"
+                                    label="Wallet"
+                                    placeholder="Wallet"
+                                    options={wallets}
+                                    accessor={{
+                                        display: 'label',
+                                        value: 'id',
+                                    }}
                                 />
                                 <FormSelectInput
                                     name="type"

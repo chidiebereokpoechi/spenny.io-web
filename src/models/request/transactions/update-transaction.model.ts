@@ -7,6 +7,7 @@ export class UpdateTransactionModel extends CreateTransactionModel {
         super(tracker)
         this.label = transaction.label
         this.description = transaction.description ?? ''
+        this.walletId = transaction.wallet.id
         this.type = transaction.type
         this.status = transaction.status
         this.amount = transaction.amount

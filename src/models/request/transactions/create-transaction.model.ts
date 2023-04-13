@@ -37,6 +37,10 @@ export class CreateTransactionModel extends BaseModel {
     @IsNumber(undefined, { each: true })
     public categories: number[] = []
 
+    @IsPositive({ message: 'Wallet is invalid' })
+    @IsNumber(undefined, { message: 'Please select a wallet' })
+    public walletId: number | null = null
+
     @Allow()
     public trackerId!: number
 

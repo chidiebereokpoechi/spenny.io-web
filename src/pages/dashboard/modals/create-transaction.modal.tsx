@@ -23,11 +23,13 @@ interface Props extends ModalProps {
 }
 
 export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...props }) => {
-    const { categoriesStore, transactionsStore } = useStores()
+    const { categoriesStore, transactionsStore, walletsStore } = useStores()
     const hasTransactions = transactionsStore.transactions.length > 0
     const submitButtonText = hasTransactions ? 'Create transaction' : 'Create first transaction'
     const setIsOpen = props.setIsOpen
     const categoriesLoading = categoriesStore.loading
+    const walletsLoading = walletsStore.loading
+    const wallets = walletsStore.wallets
 
     const close = useCallback(() => {
         setIsOpen(false)
@@ -61,7 +63,7 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
         <SideModal {...props}>
             <Formik initialValues={new CreateTransactionModel(tracker)} validate={validateModel} onSubmit={onSubmit}>
                 {({ handleSubmit }) => (
-                    <Loader loading={categoriesLoading}>
+                    <Loader loading={categoriesLoading || walletsLoading}>
                         <form onSubmit={handleSubmit} className="flex flex-col h-full">
                             <header className="grid grid-cols-1 gap-4 px-12 pt-12 pb-4">
                                 <span className="text-3xl font-extrabold text-black">Create a new transaction</span>
@@ -75,6 +77,16 @@ export const CreateTransactionModal: React.FC<Props> = observer(({ tracker, ...p
                                     name="description"
                                     label="Description"
                                     placeholder="Description (optional): eg. Music streaming service"
+                                />
+                                <FormSelectInput
+                                    name="walletId"
+                                    label="Wallet"
+                                    placeholder="Wallet"
+                                    options={wallets}
+                                    accessor={{
+                                        display: 'label',
+                                        value: 'id',
+                                    }}
                                 />
                                 <FormSelectInput
                                     name="type"
