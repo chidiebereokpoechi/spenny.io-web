@@ -78,6 +78,8 @@ export class TransactionsStore implements Resettable {
             categoriesValue: map(sortedCategories, 'label.0').join(''),
             status: transaction.status,
             type: transaction.type,
+            wallet: transaction.wallet,
+            walletValue: transaction.wallet.id,
             amount: transaction.amount,
             date: transaction.date,
             recurs: describeRecurrence(transaction.every, unit),

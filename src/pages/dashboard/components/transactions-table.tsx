@@ -64,6 +64,22 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
                         },
                     },
                     {
+                        Header: 'Wallet',
+                        accessor: 'walletValue',
+                        Cell({ cell }: CellProps<ComputedTransaction>) {
+                            const { wallet } = cellValue(cell)
+                            const { background_color: backgroundColor, color, label } = wallet
+
+                            return (
+                                <div className="inline-flex py-1 px-2 rounded" style={{ backgroundColor }}>
+                                    <span className="font-[500]" style={{ color }}>
+                                        {label}
+                                    </span>
+                                </div>
+                            )
+                        },
+                    },
+                    {
                         Header: 'Status',
                         accessor: 'status',
                         Cell({ cell }: CellProps<ComputedTransaction>) {
