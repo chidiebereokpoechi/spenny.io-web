@@ -68,6 +68,11 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
                         accessor: 'walletValue',
                         Cell({ cell }: CellProps<ComputedTransaction>) {
                             const { wallet } = cellValue(cell)
+
+                            if (!wallet) {
+                                return null
+                            }
+
                             const { background_color: backgroundColor, color, label } = wallet
 
                             return (

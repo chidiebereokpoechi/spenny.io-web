@@ -14,7 +14,7 @@ export interface Transaction {
     every: number
     recurrence_unit: RecurrenceUnit
     categories: Category[]
-    wallet: Wallet
+    wallet?: Wallet
     created_at: string
     updated_at: string
 }

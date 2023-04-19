@@ -37,7 +37,7 @@ export class TransactionsStore implements Resettable {
         const estimatedMonthlyNet = estimatedMonthlyIncome - estimatedMonthlyExpenses
 
         const aggregate: TransactionAggregate = {
-            transactions,
+            transactions: orderBy(transactions, 'paid'),
             dueThisMonth: sum(map(transactions, 'dueThisMonth')),
             leastExpensiveMonth: ['January', 20], // TODO: remove stub
             mostExpensiveMonth: ['January', 20], // TODO: remove stub
@@ -79,7 +79,7 @@ export class TransactionsStore implements Resettable {
             status: transaction.status,
             type: transaction.type,
             wallet: transaction.wallet,
-            walletValue: transaction.wallet.id,
+            walletValue: transaction.wallet?.id,
             amount: transaction.amount,
             date: transaction.date,
             recurs: describeRecurrence(transaction.every, unit),

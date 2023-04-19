@@ -6,7 +6,7 @@ export interface ComputedTransaction {
     status: Transaction['status']
     type: Transaction['type']
     wallet: Transaction['wallet']
-    walletValue: Transaction['wallet']['id']
+    walletValue?: number
     categories: Transaction['categories']
     categoriesValue: string
     amount: number
