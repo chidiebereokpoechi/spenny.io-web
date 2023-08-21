@@ -15,6 +15,7 @@ export interface ComputedTransaction {
     recurrenceValue: number
     nextPayment: string
     nextPaymentFormatted: string
+    selectedMonth: number
     estimatedMonthly: number
     dueThisMonth: number
     paid: boolean
