@@ -1,4 +1,4 @@
-import { isSameMonth } from 'date-fns'
+import { endOfMonth, isSameMonth } from 'date-fns'
 import { map, orderBy } from 'lodash'
 import { DateTime, Duration } from 'luxon'
 import { ComputedTransaction, Transaction, Wallet } from '../models/response'
@@ -7,20 +7,20 @@ import { describeRecurrence } from '../util/time'
 import { DomainCategory } from './category'
 
 export class DomainTransaction {
-    public readonly id: number
-    public readonly label: string
-    public readonly description?: string
+    private readonly id: number
+    private readonly label: string
+    private readonly description?: string
     private readonly imageUrl?: string
-    public readonly status: TransactionStatus
-    public readonly type: TransactionType
-    public readonly amount: number
-    public readonly date: DateTime
-    public readonly every: number
-    public readonly recurrenceUnit: RecurrenceUnit
+    private readonly status: TransactionStatus
+    private readonly type: TransactionType
+    private readonly amount: number
+    private readonly date: DateTime
+    private readonly every: number
+    private readonly recurrenceUnit: RecurrenceUnit
     private readonly categories: DomainCategory[]
-    public readonly wallet?: Wallet
-    public readonly createdAt: DateTime
-    public readonly updatedAt: DateTime
+    private readonly wallet?: Wallet
+    private readonly createdAt: DateTime
+    private readonly updatedAt: DateTime
 
     public get isActive(): boolean {
         return this.status === TransactionStatus.Active
@@ -44,12 +44,6 @@ export class DomainTransaction {
 
     public get estimatedMonthly(): number {
         return this.isActive ? this.amount / Duration.fromObject({ [this.recurrenceUnit]: this.every }).as('months') : 0
-    }
-
-    public get dueThisMonth(): number {
-        const now = DateTime.now()
-        const amount = this.getAmountForSelectedMonth(now)
-        return this.isActive ? amount : 0
     }
 
     constructor(
@@ -138,15 +132,27 @@ export class DomainTransaction {
     }
 
     public getAmountForSelectedMonth(date: DateTime): number {
+        const endDate = DateTime.fromJSDate(endOfMonth(date.toJSDate())).minus({ month: 1 })
+        const { nextPaymentDate } = this.getNextPaymentDate(endDate)
+        const sameMonth = isSameMonth(date.toJSDate(), nextPaymentDate.toJSDate())
+        return sameMonth && this.isActive ? this.amount : 0
+    }
+
+    public getDueThisMonth(date: DateTime): number {
         const { nextPaymentDate } = this.getNextPaymentDate(date)
         const sameMonth = isSameMonth(date.toJSDate(), nextPaymentDate.toJSDate())
-        return this.type === TransactionType.Expense && sameMonth ? this.amount : 0
+        return this.type === TransactionType.Expense && this.isActive && sameMonth ? this.amount : 0
+    }
+
+    public matchesFilter(filter: string): boolean {
+        return this.label.toLowerCase().includes(filter.toLowerCase().trim())
     }
 
     public computeForDate(date: DateTime): ComputedTransaction {
         const { categories, categoriesValue } = this.orderedCategories
         const { recurs, recurrenceValue } = this.recurrence
         const { nextPaymentISO: nextPayment, nextPaymentFormatted } = this.getNextPaymentDate(date)
+        const dueThisMonth = this.getDueThisMonth(date)
         const selectedMonth = this.getAmountForSelectedMonth(date)
 
         return {
@@ -165,9 +171,9 @@ export class DomainTransaction {
             nextPayment,
             nextPaymentFormatted,
             estimatedMonthly: this.estimatedMonthly,
-            dueThisMonth: this.dueThisMonth,
+            dueThisMonth,
             selectedMonth,
-            paid: this.dueThisMonth === 0,
+            paid: dueThisMonth === 0,
             transaction: this.toPlain(),
         }
     }

@@ -8,14 +8,15 @@ export interface TextInputProps extends HTMLMotionProps<'input'> {
     className?: string
     label: string
     errors?: string[]
+    alwaysShowLabel?: boolean
 }
 
-export const TextInput: React.FC<TextInputProps> = ({ className, label, errors, ...props }) => {
+export const TextInput: React.FC<TextInputProps> = ({ className, alwaysShowLabel, label, errors, ...props }) => {
     const invalid = !!errors?.length
 
     return (
         <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
-            {!!props.value && (
+            {(!!props.value || alwaysShowLabel) && (
                 <label htmlFor={props.name} className="text-xs text-slate-500">
                     {label}
                 </label>

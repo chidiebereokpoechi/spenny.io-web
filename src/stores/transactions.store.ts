@@ -16,6 +16,8 @@ export class TransactionsStore implements Resettable {
     public aggregate: Nullable<TransactionAggregate> = null
     public loading: boolean = false
     public ready: boolean = false
+    public date: Date = new Date()
+    public filter: string = ''
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
@@ -23,8 +25,10 @@ export class TransactionsStore implements Resettable {
     }
 
     private getAggregate(): TransactionAggregate {
-        const transactions = map(this.transactions, (transaction) =>
-            DomainTransaction.fromPlain(transaction).computeForDate(DateTime.now())
+        const domainTransactions = map(this.transactions, (transaction) => DomainTransaction.fromPlain(transaction))
+        const transactions = map(
+            filter(domainTransactions, (transaction) => transaction.matchesFilter(this.filter)),
+            (transaction) => transaction.computeForDate(DateTime.fromJSDate(this.date))
         )
 
         const expenses = filter(transactions, { type: TransactionType.Expense })
@@ -34,9 +38,9 @@ export class TransactionsStore implements Resettable {
         const totalIncome = sum(map(income, 'amount'))
         const totalNet = totalIncome - totalExpenses
 
-        const estimatedMonthlyExpenses = sum(map(expenses, 'estimatedMonthly'))
-        const estimatedMonthlyIncome = sum(map(income, 'estimatedMonthly'))
-        const estimatedMonthlyNet = estimatedMonthlyIncome - estimatedMonthlyExpenses
+        const selectedMonthExpenses = sum(map(expenses, 'selectedMonth'))
+        const selectedMonthIncome = sum(map(income, 'selectedMonth'))
+        const selectedMonthNet = selectedMonthIncome - selectedMonthExpenses
 
         const aggregate: TransactionAggregate = {
             transactions: orderBy(transactions, 'paid'),
@@ -45,7 +49,7 @@ export class TransactionsStore implements Resettable {
             mostExpensiveMonth: ['January', 20], // TODO: remove stub
             paidThisMonth: every(transactions, 'paid'),
             totalAmount: [totalIncome, totalExpenses, totalNet],
-            totalEstimatedMonthly: [estimatedMonthlyIncome, estimatedMonthlyExpenses, estimatedMonthlyNet],
+            totalSelectedMonth: [selectedMonthIncome, selectedMonthExpenses, selectedMonthNet],
         }
 
         return aggregate
@@ -137,6 +141,18 @@ export class TransactionsStore implements Resettable {
         this.transactions = transactions
         this.aggregate = this.getAggregate()
         dehydrateToStorage(TRANSACTIONS_KEY, transactions)
+    }
+
+    @action
+    public setDate(date: Date): void {
+        this.date = date
+        this.aggregate = this.getAggregate()
+    }
+
+    @action
+    public setFilter(filter: string): void {
+        this.filter = filter
+        this.aggregate = this.getAggregate()
     }
 
     @action

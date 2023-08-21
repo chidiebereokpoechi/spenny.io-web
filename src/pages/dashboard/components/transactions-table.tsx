@@ -133,19 +133,19 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
                         },
                     },
                     {
-                        Header: 'Estimated monthly',
-                        accessor: 'estimatedMonthly',
+                        Header: 'Selected month amount',
+                        accessor: 'selectedMonth',
                         Cell({ cell }: CellProps<ComputedTransaction>) {
                             const transaction = cellValue(cell)
                             return (
                                 <div className="flex justify-between">
                                     <span>£</span>
-                                    <span>{transaction.estimatedMonthly.toFixed(2)}</span>
+                                    <span>{transaction.selectedMonth.toFixed(2)}</span>
                                 </div>
                             )
                         },
                         Footer() {
-                            const [income, expenses, net] = (aggregate as TransactionAggregate).totalEstimatedMonthly
+                            const [income, expenses, net] = (aggregate as TransactionAggregate).totalSelectedMonth
 
                             return <NetAmount {...{ income, expenses, net }} />
                         },
