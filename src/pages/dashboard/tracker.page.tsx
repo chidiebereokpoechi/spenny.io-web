@@ -1,6 +1,6 @@
 import { PencilIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { observer } from 'mobx-react'
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { PrimaryButton } from '../../components/buttons'
 import { DateInput } from '../../components/input'
@@ -54,12 +54,6 @@ export const TrackerPage: React.FC = observer(() => {
 
     const selectDate = (date: Date) => {
         transactionsStore.setDate(date)
-    }
-
-    const setFilter = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log(e)
-        const filter = e.target.value
-        transactionsStore.setFilter(filter)
     }
 
     useEffect(() => {
