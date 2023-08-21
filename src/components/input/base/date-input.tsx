@@ -15,8 +15,10 @@ export interface DateInputProps {
     label: string
     errors?: string[]
     placeholder?: string
-    onChange?: (...args: any[]) => any
+    onChange?: (date: Date) => any
     value?: Date
+    format?: string
+    allowFutureDates?: boolean
 }
 
 const CustomHeader: React.FC<ReactDatePickerCustomHeaderProps> = ({
@@ -47,10 +49,20 @@ const CustomHeader: React.FC<ReactDatePickerCustomHeaderProps> = ({
     </div>
 )
 
-export const DateInput: React.FC<DateInputProps> = ({ className, label, errors, onChange, value, placeholder }) => {
+export const DateInput: React.FC<DateInputProps> = ({
+    className,
+    label,
+    errors,
+    onChange,
+    value,
+    placeholder,
+    format,
+    allowFutureDates,
+}) => {
     const invalid = !!errors?.length
     const [ref, dimensions] = useDimensions()
     const [width, setWidth] = useState(dimensions.width)
+    const dateFormat = format ?? 'do MMMM yyyy'
 
     useEffect(() => {
         setWidth(dimensions.width)
@@ -77,7 +89,7 @@ export const DateInput: React.FC<DateInputProps> = ({ className, label, errors, 
     )
 
     const setDate = useCallback(
-        (date: Date | null) => {
+        (date: Date) => {
             onChange?.(date)
         },
         [onChange]
@@ -98,13 +110,13 @@ export const DateInput: React.FC<DateInputProps> = ({ className, label, errors, 
                 calendarClassName="w-full"
                 calendarStartDay={1} // Monday
                 selected={value}
-                maxDate={new Date()}
+                maxDate={allowFutureDates ? undefined : new Date()}
                 onChange={setDate}
                 placeholderText={placeholder}
                 calendarContainer={Container}
                 renderCustomHeader={CustomHeader}
                 formatWeekDay={formatWeekDay}
-                dateFormat="do MMMM yyyy"
+                dateFormat={dateFormat}
             />
             {invalid && (
                 <div className="mt-2 grid grid-cols-1 gap-2">

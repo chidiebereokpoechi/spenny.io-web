@@ -1,14 +1,13 @@
-import { isSameMonth } from 'date-fns'
 import { every, filter, map, orderBy, remove, sum } from 'lodash'
-import { DateTime, Duration } from 'luxon'
 import { action, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
 import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
-import { ComputedTransaction, Transaction, TransactionAggregate } from '../models/response'
-import { HttpMethod, TransactionStatus, TransactionType } from '../util/constants'
-import { dehydrateToStorage, hydrateFromStorage, Resettable } from '../util/misc'
+import { Transaction, TransactionAggregate } from '../models/response'
+import { HttpMethod, TransactionType } from '../util/constants'
+import { Resettable, dehydrateToStorage, hydrateFromStorage } from '../util/misc'
 import { request } from '../util/request'
-import { describeRecurrence, getAddDateFunction } from '../util/time'
+import { DomainTransaction } from '../domain'
+import { DateTime } from 'luxon'
 
 const TRANSACTIONS_KEY = 'SPENNY.IO:TRANSACTIONS'
 
@@ -17,6 +16,8 @@ export class TransactionsStore implements Resettable {
     public aggregate: Nullable<TransactionAggregate> = null
     public loading: boolean = false
     public ready: boolean = false
+    public date: Date = new Date()
+    public filter: string = ''
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
@@ -24,7 +25,12 @@ export class TransactionsStore implements Resettable {
     }
 
     private getAggregate(): TransactionAggregate {
-        const transactions = map(this.transactions, this.processTransaction)
+        const domainTransactions = map(this.transactions, (transaction) => DomainTransaction.fromPlain(transaction))
+        const transactions = map(
+            filter(domainTransactions, (transaction) => transaction.matchesFilter(this.filter)),
+            (transaction) => transaction.computeForDate(DateTime.fromJSDate(this.date))
+        )
+
         const expenses = filter(transactions, { type: TransactionType.Expense })
         const income = filter(transactions, { type: TransactionType.Income })
 
@@ -32,9 +38,9 @@ export class TransactionsStore implements Resettable {
         const totalIncome = sum(map(income, 'amount'))
         const totalNet = totalIncome - totalExpenses
 
-        const estimatedMonthlyExpenses = sum(map(expenses, 'estimatedMonthly'))
-        const estimatedMonthlyIncome = sum(map(income, 'estimatedMonthly'))
-        const estimatedMonthlyNet = estimatedMonthlyIncome - estimatedMonthlyExpenses
+        const selectedMonthExpenses = sum(map(expenses, 'selectedMonth'))
+        const selectedMonthIncome = sum(map(income, 'selectedMonth'))
+        const selectedMonthNet = selectedMonthIncome - selectedMonthExpenses
 
         const aggregate: TransactionAggregate = {
             transactions: orderBy(transactions, 'paid'),
@@ -43,54 +49,10 @@ export class TransactionsStore implements Resettable {
             mostExpensiveMonth: ['January', 20], // TODO: remove stub
             paidThisMonth: every(transactions, 'paid'),
             totalAmount: [totalIncome, totalExpenses, totalNet],
-            totalEstimatedMonthly: [estimatedMonthlyIncome, estimatedMonthlyExpenses, estimatedMonthlyNet],
+            totalSelectedMonth: [selectedMonthIncome, selectedMonthExpenses, selectedMonthNet],
         }
 
         return aggregate
-    }
-
-    private fallbackIfInactive<T>(isActive: boolean, valueIfActive: T, valueIfInactive: T): T {
-        return isActive ? valueIfActive : valueIfInactive
-    }
-
-    private processTransaction(transaction: Transaction): ComputedTransaction {
-        const unit = transaction.recurrence_unit
-        const dateOfPurchase = DateTime.fromISO(transaction.date)
-        const durationSincePurchase = DateTime.fromMillis(Date.now()).diff(dateOfPurchase, unit, {
-            conversionAccuracy: 'longterm',
-        })
-
-        const isActive = transaction.status === TransactionStatus.Active
-
-        const addFunction = getAddDateFunction(unit)
-        const multiplier = Math.ceil(durationSincePurchase.as(transaction.recurrence_unit) / transaction.every)
-        const nextPaymentDate = addFunction(dateOfPurchase.toJSDate(), transaction.every * multiplier)
-        const nextPaymentFormatted = DateTime.fromJSDate(nextPaymentDate).toFormat('dd MMMM yyyy')
-        const sameMonth = isSameMonth(new Date(), nextPaymentDate)
-        const dueThisMonth = transaction.type === TransactionType.Expense && sameMonth ? transaction.amount : 0
-        const sortedCategories = orderBy(transaction.categories, 'label')
-        const estimatedMonthly = transaction.amount / Duration.fromObject({ [unit]: transaction.every }).as('months')
-
-        return {
-            label: transaction.label,
-            description: transaction.description,
-            categories: sortedCategories,
-            categoriesValue: map(sortedCategories, 'label.0').join(''),
-            status: transaction.status,
-            type: transaction.type,
-            wallet: transaction.wallet,
-            walletValue: transaction.wallet?.id,
-            amount: transaction.amount,
-            date: transaction.date,
-            recurs: describeRecurrence(transaction.every, unit),
-            recurrenceValue: Duration.fromObject({ [unit]: transaction.every }).toMillis(),
-            nextPayment: nextPaymentDate.toISOString(),
-            nextPaymentFormatted: nextPaymentFormatted,
-            estimatedMonthly: this.fallbackIfInactive(isActive, estimatedMonthly, 0),
-            dueThisMonth: this.fallbackIfInactive(isActive, dueThisMonth, 0),
-            paid: this.fallbackIfInactive(isActive, dueThisMonth === 0, true),
-            transaction,
-        }
     }
 
     @action
@@ -179,6 +141,18 @@ export class TransactionsStore implements Resettable {
         this.transactions = transactions
         this.aggregate = this.getAggregate()
         dehydrateToStorage(TRANSACTIONS_KEY, transactions)
+    }
+
+    @action
+    public setDate(date: Date): void {
+        this.date = date
+        this.aggregate = this.getAggregate()
+    }
+
+    @action
+    public setFilter(filter: string): void {
+        this.filter = filter
+        this.aggregate = this.getAggregate()
     }
 
     @action

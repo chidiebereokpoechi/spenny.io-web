@@ -3,6 +3,7 @@ import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { PrimaryButton } from '../../components/buttons'
+import { DateInput } from '../../components/input'
 import { DashboardPageWrapper, Loader } from '../../components/layout'
 import { Category, Transaction } from '../../models/response'
 import useDimensions from '../../util/misc/dimensions'
@@ -25,6 +26,7 @@ export const TrackerPage: React.FC = observer(() => {
     const trackersLoading = trackersStore.loading
     const transactionsLoading = transactionsStore.loading
     const ready = trackersStore.ready
+    const date = transactionsStore.date
     const [activeCategory, setActiveCategory] = useState<Category | null>(null)
     const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null)
 
@@ -36,19 +38,23 @@ export const TrackerPage: React.FC = observer(() => {
         setIsCreateTransactionModalOpen(true)
     }, [])
 
-    const openCategory = useCallback((category: Category) => {
+    const openCategory = (category: Category) => {
         return () => {
             setActiveCategory(category)
             setIsEditCategoryModalOpen(true)
         }
-    }, [])
+    }
 
-    const openTransaction = useCallback((transaction: Transaction) => {
+    const openTransaction = (transaction: Transaction) => {
         return () => {
             setActiveTransaction(transaction)
             setIsEditTransactionModalOpen(true)
         }
-    }, [])
+    }
+
+    const selectDate = (date: Date) => {
+        transactionsStore.setDate(date)
+    }
 
     useEffect(() => {
         const subscription = trackersStore.retrieveTracker(+id!).subscribe()
@@ -114,6 +120,17 @@ export const TrackerPage: React.FC = observer(() => {
                                 <span>Create transaction</span>
                             </PrimaryButton>
                         )}
+                    </div>
+                    <div className="flex justify-between space-x-4">
+                        <div className="w-[300px]">
+                            <DateInput
+                                label="Select date"
+                                name="date"
+                                allowFutureDates
+                                value={date}
+                                onChange={selectDate}
+                            />
+                        </div>
                     </div>
                 </header>
                 <Loader loading={transactionsLoading}>
