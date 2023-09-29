@@ -3,7 +3,7 @@ import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { PrimaryButton } from '../../components/buttons'
-import { DateInput } from '../../components/input'
+import { DateInput, SelectInput } from '../../components/input'
 import { DashboardPageWrapper, Loader } from '../../components/layout'
 import { Category, Transaction } from '../../models/response'
 import useDimensions from '../../util/misc/dimensions'
@@ -13,7 +13,7 @@ import { CreateTransactionModal, UpdateCategoryModal, UpdateTrackerModal, Update
 
 export const TrackerPage: React.FC = observer(() => {
     const { id } = useParams()
-    const { trackersStore, transactionsStore } = useStores()
+    const { trackersStore, transactionsStore, walletsStore } = useStores()
     const [ref, dimensions] = useDimensions()
     const [isEditTrackerModalOpen, setIsEditTrackerModalOpen] = useState(false)
     const [isCreateTransactionModalOpen, setIsCreateTransactionModalOpen] = useState(false)
@@ -22,6 +22,8 @@ export const TrackerPage: React.FC = observer(() => {
     const aggregate = transactionsStore.aggregate
     const transactions = aggregate?.transactions
     const hasTransactions = !!transactions?.length
+    const wallets = walletsStore.wallets
+    const selectedWallets = transactionsStore.wallets
     const activeTracker = trackersStore.activeTracker
     const trackersLoading = trackersStore.loading
     const transactionsLoading = transactionsStore.loading
@@ -56,12 +58,23 @@ export const TrackerPage: React.FC = observer(() => {
         transactionsStore.setDate(date)
     }
 
+    const selectWallets = (wallets: number[]) => {
+        transactionsStore.setWallets(wallets)
+    }
+
     useEffect(() => {
         const subscription = trackersStore.retrieveTracker(+id!).subscribe()
         return () => {
             subscription.unsubscribe()
         }
     }, [trackersStore, id])
+
+    useEffect(() => {
+        const subscription = walletsStore.listWallets().subscribe()
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [walletsStore])
 
     useEffect(() => {
         if (ready && activeTracker) {
@@ -121,7 +134,7 @@ export const TrackerPage: React.FC = observer(() => {
                             </PrimaryButton>
                         )}
                     </div>
-                    <div className="flex justify-between space-x-4">
+                    <div className="flex space-x-4">
                         <div className="w-[300px]">
                             <DateInput
                                 label="Select date"
@@ -129,6 +142,19 @@ export const TrackerPage: React.FC = observer(() => {
                                 allowFutureDates
                                 value={date}
                                 onChange={selectDate}
+                            />
+                        </div>
+                        <div className="w-[300px]">
+                            <SelectInput
+                                name="wallets"
+                                label="Filter by wallets"
+                                placeholder="Select wallets"
+                                multiple
+                                disableHideLabel
+                                options={wallets}
+                                accessor={{ display: 'label', value: 'id' }}
+                                onChange={selectWallets}
+                                value={selectedWallets}
                             />
                         </div>
                     </div>

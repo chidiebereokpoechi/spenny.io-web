@@ -26,7 +26,7 @@ const TrackerButton: React.FC<Tracker> = ({ id, label, description }) => {
 }
 
 export const DashboardPage: React.FC = observer(() => {
-    const { trackersStore } = useStores()
+    const { trackersStore, walletsStore } = useStores()
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const trackers = trackersStore.trackers
     const trackersLoading = trackersStore.loading
@@ -41,6 +41,13 @@ export const DashboardPage: React.FC = observer(() => {
             subscription.unsubscribe()
         }
     }, [trackersStore])
+
+    useEffect(() => {
+        const subscription = walletsStore.listWallets().subscribe()
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [walletsStore])
 
     return (
         <DashboardPageWrapper>

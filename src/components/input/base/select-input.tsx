@@ -9,6 +9,7 @@ import { usePopper } from 'react-popper'
 export interface SelectInputProps<T> {
     name: string
     className?: string
+    disableHideLabel?: boolean
     label: string
     errors?: string[]
     placeholder?: string
@@ -26,6 +27,7 @@ export interface SelectInputProps<T> {
 export const SelectInput = <T,>({
     name,
     className,
+    disableHideLabel,
     label,
     errors,
     placeholder,
@@ -42,7 +44,7 @@ export const SelectInput = <T,>({
     const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
     const [popperElement, setPopperElement] = useState<any>(null)
     const { styles, attributes } = usePopper(referenceElement, popperElement, {
-        placement: 'top',
+        placement: 'bottom',
         strategy: 'fixed',
         modifiers: [
             {
@@ -95,7 +97,7 @@ export const SelectInput = <T,>({
 
     return (
         <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
-            {!showPlaceholder && (
+            {(!showPlaceholder || disableHideLabel) && (
                 <label htmlFor={name} className="text-xs text-slate-500">
                     {label}
                 </label>

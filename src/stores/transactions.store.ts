@@ -17,17 +17,25 @@ export class TransactionsStore implements Resettable {
     public loading: boolean = false
     public ready: boolean = false
     public date: Date = new Date()
-    public filter: string = ''
+    public nameFilter: string = ''
+    public wallets: number[] = []
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
         this.setUp()
     }
 
+    private get filterInput() {
+        return {
+            name: this.nameFilter,
+            wallets: this.wallets,
+        }
+    }
+
     private getAggregate(): TransactionAggregate {
         const domainTransactions = map(this.transactions, (transaction) => DomainTransaction.fromPlain(transaction))
         const transactions = map(
-            filter(domainTransactions, (transaction) => transaction.matchesFilter(this.filter)),
+            filter(domainTransactions, (transaction) => transaction.filter(this.filterInput)),
             (transaction) => transaction.computeForDate(DateTime.fromJSDate(this.date))
         )
 
@@ -150,8 +158,14 @@ export class TransactionsStore implements Resettable {
     }
 
     @action
+    public setWallets(wallets: number[]): void {
+        this.wallets = wallets
+        this.aggregate = this.getAggregate()
+    }
+
+    @action
     public setFilter(filter: string): void {
-        this.filter = filter
+        this.nameFilter = filter
         this.aggregate = this.getAggregate()
     }
 

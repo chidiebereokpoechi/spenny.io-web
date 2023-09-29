@@ -5,6 +5,7 @@ import { ComputedTransaction, Transaction, Wallet } from '../models/response'
 import { RecurrenceUnit, TransactionStatus, TransactionType } from '../util/constants'
 import { describeRecurrence } from '../util/time'
 import { DomainCategory } from './category'
+import { TransactionFilter } from './transaction-filter'
 
 export class DomainTransaction {
     private readonly id: number
@@ -141,11 +142,22 @@ export class DomainTransaction {
     public getDueThisMonth(date: DateTime): number {
         const { nextPaymentDate } = this.getNextPaymentDate(date)
         const sameMonth = isSameMonth(date.toJSDate(), nextPaymentDate.toJSDate())
-        return this.type === TransactionType.Expense && this.isActive && sameMonth ? this.amount : 0
+        const sameDayOfMonth = date.day === nextPaymentDate.day
+
+        if (this.type === TransactionType.Expense && this.isActive) {
+            if (sameMonth || (!sameMonth && sameDayOfMonth)) return this.amount
+        }
+
+        return 0
     }
 
-    public matchesFilter(filter: string): boolean {
-        return this.label.toLowerCase().includes(filter.toLowerCase().trim())
+    public filter(filter: TransactionFilter): boolean {
+        const { name, wallets } = filter
+
+        if (name && !this.label.includes(name)) return false
+        if (wallets && wallets.length && (!this.wallet || !wallets.includes(this.wallet.id))) return false
+
+        return true
     }
 
     public computeForDate(date: DateTime): ComputedTransaction {
