@@ -120,8 +120,7 @@ export const TrackerPage: React.FC = observer(() => {
                 </>
             )}
             <Loader loading={trackersLoading}>
-                <header className="p-8 grid grid-cols-1 gap-4" ref={ref}>
-                    <span className="text-3xl font-extrabold text-black">{activeTracker?.label}</span>
+                <header className="p-6 grid grid-cols-1 gap-4" ref={ref}>
                     <div className="flex justify-between space-x-4">
                         <PrimaryButton type="button" onClick={openEditTrackerModal}>
                             <PencilIcon className="h-3" strokeWidth={2} />

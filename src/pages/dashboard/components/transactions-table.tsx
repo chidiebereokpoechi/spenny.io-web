@@ -25,6 +25,12 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
             <BasicTable
                 columns={[
                     {
+                        Header: 'S/n',
+                        Cell({ cell }: CellProps<ComputedTransaction>) {
+                            return <span>{cell.row.index + 1}</span>
+                        },
+                    },
+                    {
                         Header: 'Label',
                         accessor: 'label',
                         Cell({ cell }: CellProps<ComputedTransaction>) {
@@ -55,7 +61,10 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
                             const { backgroundColor, color, text } = transactionTypeLabelMap[type]
 
                             return (
-                                <div className="inline-flex py-1 px-2 rounded" style={{ backgroundColor }}>
+                                <div
+                                    className="inline-flex py-1 px-2 rounded w-full justify-center"
+                                    style={{ backgroundColor }}
+                                >
                                     <span className="font-[500]" style={{ color }}>
                                         {text}
                                     </span>
@@ -76,7 +85,10 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
                             const { background_color: backgroundColor, color, label } = wallet
 
                             return (
-                                <div className="inline-flex py-1 px-2 rounded" style={{ backgroundColor }}>
+                                <div
+                                    className="inline-flex py-1 px-2 rounded w-full justify-center"
+                                    style={{ backgroundColor }}
+                                >
                                     <span className="font-[500]" style={{ color }}>
                                         {label}
                                     </span>
@@ -92,7 +104,10 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
                             const { backgroundColor, color, text } = transactionStatusLabelMap[status]
 
                             return (
-                                <div className="inline-flex py-1 px-2 rounded" style={{ backgroundColor }}>
+                                <div
+                                    className="inline-flex py-1 px-2 rounded w-full justify-center"
+                                    style={{ backgroundColor }}
+                                >
                                     <span className="font-[500]" style={{ color }}>
                                         {text}
                                     </span>
