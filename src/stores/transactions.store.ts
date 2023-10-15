@@ -1,18 +1,18 @@
 import { every, filter, map, orderBy, remove, sum } from 'lodash'
+import { DateTime } from 'luxon'
 import { action, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
+import { DomainTransaction } from '../domain'
 import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
 import { Transaction, TransactionAggregate } from '../models/response'
 import { HttpMethod, TransactionType } from '../util/constants'
 import { Resettable, dehydrateToStorage, hydrateFromStorage } from '../util/misc'
 import { request } from '../util/request'
-import { DomainTransaction } from '../domain'
-import { DateTime } from 'luxon'
 
 const TRANSACTIONS_KEY = 'SPENNY.IO:TRANSACTIONS'
 
 export class TransactionsStore implements Resettable {
-    public transactions: Transaction[] = []
+    public transactions: DomainTransaction[] = []
     public aggregate: Nullable<TransactionAggregate> = null
     public loading: boolean = false
     public ready: boolean = false
@@ -33,9 +33,8 @@ export class TransactionsStore implements Resettable {
     }
 
     private getAggregate(): TransactionAggregate {
-        const domainTransactions = map(this.transactions, (transaction) => DomainTransaction.fromPlain(transaction))
         const transactions = map(
-            filter(domainTransactions, (transaction) => transaction.filter(this.filterInput)),
+            filter(this.transactions, (transaction) => transaction.filter(this.filterInput)),
             (transaction) => transaction.computeForDate(DateTime.fromJSDate(this.date))
         )
 
@@ -67,6 +66,12 @@ export class TransactionsStore implements Resettable {
     public setUp(): void {
         this.transactions = hydrateFromStorage(TRANSACTIONS_KEY) ?? []
         this.ready = true
+    }
+
+    @action
+    public setTransactionExclusion(transaction: DomainTransaction, excluded: boolean) {
+        transaction.setExclusion(excluded)
+        this.aggregate = this.getAggregate()
     }
 
     @action
@@ -137,7 +142,8 @@ export class TransactionsStore implements Resettable {
                     this.loading = false
 
                     if (response.data) {
-                        this.setTransactions(response.data)
+                        const transactions = map(response.data, DomainTransaction.fromPlain)
+                        this.setTransactions(transactions)
                     }
                 })
             })
@@ -145,7 +151,7 @@ export class TransactionsStore implements Resettable {
     }
 
     @action
-    public setTransactions(transactions: Transaction[]): void {
+    public setTransactions(transactions: DomainTransaction[]): void {
         this.transactions = transactions
         this.aggregate = this.getAggregate()
         dehydrateToStorage(TRANSACTIONS_KEY, transactions)

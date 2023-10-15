@@ -1,3 +1,4 @@
+import { DomainTransaction } from '../../domain'
 import { Transaction } from './transaction'
 
 export interface ComputedTransaction {
@@ -19,5 +20,5 @@ export interface ComputedTransaction {
     estimatedMonthly: number
     dueThisMonth: number
     paid: boolean
-    transaction: Transaction
+    transaction: DomainTransaction
 }

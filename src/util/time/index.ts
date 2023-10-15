@@ -1,2 +1,5 @@
+export * from './ceil'
 export * from './describe-recurrence'
+export * from './floor'
 export * from './get-add-date-function'
+export * from './get-difference-in-calendar-by'

@@ -1,10 +1,13 @@
 import { map } from 'lodash'
-import { Tracker, Transaction } from '../../response'
+import { DomainTransaction } from '../../../domain'
+import { Tracker } from '../../response'
 import { CreateTransactionModel } from './create-transaction.model'
 
 export class UpdateTransactionModel extends CreateTransactionModel {
-    constructor(transaction: Transaction, tracker: Tracker) {
+    constructor(domainTransaction: DomainTransaction, tracker: Tracker) {
         super(tracker)
+        const transaction = domainTransaction.toPlain()
+
         this.label = transaction.label
         this.description = transaction.description ?? ''
         this.walletId = transaction.wallet?.id ?? null

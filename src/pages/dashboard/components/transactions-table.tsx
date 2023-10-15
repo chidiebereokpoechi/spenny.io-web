@@ -1,10 +1,11 @@
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { CheckIcon, MinusIcon, PlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { every, map } from 'lodash'
 import React from 'react'
 import { CellProps } from 'react-table'
 import { MiniCategoryButton } from '../../../components/layout'
 import { BasicTable } from '../../../components/tables'
-import { Category, ComputedTransaction, Transaction, TransactionAggregate } from '../../../models/response'
+import { DomainTransaction } from '../../../domain'
+import { Category, ComputedTransaction, TransactionAggregate } from '../../../models/response'
 import { transactionStatusLabelMap, transactionTypeLabelMap } from '../../../util/constants'
 import { cellValue, classNames } from '../../../util/misc'
 import { DimensionObject } from '../../../util/misc/dimensions'
@@ -12,12 +13,19 @@ import { NetAmount } from './aggregate'
 
 interface Props {
     aggregate: TransactionAggregate
-    openTransaction: (transaction: Transaction) => () => void
+    openTransaction: (transaction: DomainTransaction) => () => void
+    setExclusion: (transaction: DomainTransaction, exclusion: boolean) => () => void
     openCategory: (category: Category) => () => void
     dimensions?: DimensionObject
 }
 
-export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction, openCategory, dimensions }) => {
+export const TransactionsTable: React.FC<Props> = ({
+    aggregate,
+    openTransaction,
+    setExclusion: excludeTransaction,
+    openCategory,
+    dimensions,
+}) => {
     const transactions = aggregate.transactions
 
     return (
@@ -42,10 +50,10 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
                                     <div className="flex flex-col space-y-2">
                                         <div>
                                             <button
-                                                className="inline-flex justify-start py-1 px-2 bg-slate-600 rounded"
+                                                className="inline-flex justify-start"
                                                 onClick={openTransaction(transaction.transaction)}
                                             >
-                                                <span className="font-[500] text-left text-white">{label}</span>
+                                                <span className="font-bold text-left text-slate-700">{label}</span>
                                             </button>
                                         </div>
                                     </div>
@@ -230,6 +238,28 @@ export const TransactionsTable: React.FC<Props> = ({ aggregate, openTransaction,
                                         strokeWidth={2}
                                     />
                                 </div>
+                            )
+                        },
+                    },
+                    {
+                        Header: 'In(ex)clusion',
+                        Cell({ cell }: CellProps<ComputedTransaction>) {
+                            const { transaction } = cellValue(cell)
+                            const isExcluded = transaction.isExcluded
+                            const text = isExcluded ? 'Include' : 'Exclude'
+                            const Icon = isExcluded ? PlusIcon : MinusIcon
+
+                            return (
+                                <button
+                                    onClick={excludeTransaction(transaction, !transaction.isExcluded)}
+                                    className={classNames(
+                                        isExcluded ? 'text-green-500' : 'text-red-500',
+                                        'inline-flex'
+                                    )}
+                                >
+                                    <Icon className="h-4 mr-1" strokeWidth={2} />
+                                    <span>{text}</span>
+                                </button>
                             )
                         },
                     },

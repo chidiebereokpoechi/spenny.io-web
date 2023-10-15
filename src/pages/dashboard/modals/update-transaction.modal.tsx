@@ -12,15 +12,16 @@ import {
 } from '../../../components/input'
 import { Loader } from '../../../components/layout'
 import { ModalProps, SideModal } from '../../../components/modals'
+import { DomainTransaction } from '../../../domain'
 import { UpdateTransactionModel } from '../../../models/request'
-import { Tracker, Transaction } from '../../../models/response'
+import { Tracker } from '../../../models/response'
 import { recurrenceUnitOptions, transactionStatusOptions, transactionTypeOptions } from '../../../util/constants'
 import { useStores } from '../../../util/stores'
 import { validateModel } from '../../../util/validation'
 
 interface Props extends ModalProps {
     tracker: Tracker
-    transaction: Transaction
+    transaction: DomainTransaction
 }
 
 export const UpdateTransactionModal: React.FC<Props> = observer(({ tracker, transaction, ...props }) => {

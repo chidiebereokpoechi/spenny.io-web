@@ -5,7 +5,8 @@ import { useParams } from 'react-router'
 import { PrimaryButton } from '../../components/buttons'
 import { DateInput, SelectInput } from '../../components/input'
 import { DashboardPageWrapper, Loader } from '../../components/layout'
-import { Category, Transaction } from '../../models/response'
+import { DomainTransaction } from '../../domain'
+import { Category } from '../../models/response'
 import useDimensions from '../../util/misc/dimensions'
 import { useStores } from '../../util/stores'
 import { TransactionsTable } from './components/transactions-table'
@@ -30,7 +31,7 @@ export const TrackerPage: React.FC = observer(() => {
     const ready = trackersStore.ready
     const date = transactionsStore.date
     const [activeCategory, setActiveCategory] = useState<Category | null>(null)
-    const [activeTransaction, setActiveTransaction] = useState<Transaction | null>(null)
+    const [activeTransaction, setActiveTransaction] = useState<DomainTransaction | null>(null)
 
     const openEditTrackerModal = useCallback(() => {
         setIsEditTrackerModalOpen(true)
@@ -47,10 +48,16 @@ export const TrackerPage: React.FC = observer(() => {
         }
     }
 
-    const openTransaction = (transaction: Transaction) => {
+    const openTransaction = (transaction: DomainTransaction) => {
         return () => {
             setActiveTransaction(transaction)
             setIsEditTransactionModalOpen(true)
+        }
+    }
+
+    const excludeTransaction = (transaction: DomainTransaction, excluded: boolean) => {
+        return () => {
+            transactionsStore.setTransactionExclusion(transaction, excluded)
         }
     }
 
@@ -163,6 +170,7 @@ export const TrackerPage: React.FC = observer(() => {
                         <TransactionsTable
                             openCategory={openCategory}
                             openTransaction={openTransaction}
+                            setExclusion={excludeTransaction}
                             dimensions={dimensions}
                             aggregate={aggregate}
                         />

@@ -1,14 +1,13 @@
 import { endOfMonth, isSameMonth } from 'date-fns'
-import { map, orderBy } from 'lodash'
+import { map, orderBy, round } from 'lodash'
 import { DateTime, Duration } from 'luxon'
 import { ComputedTransaction, Transaction, Wallet } from '../models/response'
 import { RecurrenceUnit, TransactionStatus, TransactionType } from '../util/constants'
-import { describeRecurrence } from '../util/time'
+import { describeRecurrence, floorDateTime } from '../util/time'
 import { DomainCategory } from './category'
 import { TransactionFilter } from './transaction-filter'
 
 export class DomainTransaction {
-    private readonly id: number
     private readonly label: string
     private readonly description?: string
     private readonly imageUrl?: string
@@ -22,6 +21,17 @@ export class DomainTransaction {
     private readonly wallet?: Wallet
     private readonly createdAt: DateTime
     private readonly updatedAt: DateTime
+
+    #id: number
+    #excluded: boolean
+
+    public get id(): number {
+        return this.#id
+    }
+
+    public get isExcluded(): boolean {
+        return this.#excluded
+    }
 
     public get isActive(): boolean {
         return this.status === TransactionStatus.Active
@@ -60,10 +70,11 @@ export class DomainTransaction {
         recurrenceUnit: RecurrenceUnit,
         categories: DomainCategory[],
         wallet: Wallet | undefined,
+        excluded: boolean,
         createdAt: DateTime,
         updatedAt: DateTime
     ) {
-        this.id = id
+        this.#id = id
         this.label = label
         this.description = description
         this.imageUrl = imageUrl
@@ -75,6 +86,7 @@ export class DomainTransaction {
         this.recurrenceUnit = recurrenceUnit
         this.categories = categories
         this.wallet = wallet
+        this.#excluded = excluded
         this.createdAt = createdAt
         this.updatedAt = updatedAt
     }
@@ -103,32 +115,37 @@ export class DomainTransaction {
             status,
             type,
             amount,
-            DateTime.fromISO(date),
+            floorDateTime(DateTime.fromISO(date)),
             every,
             recurrence_unit,
             map(categories, DomainCategory.fromPlain),
             wallet,
+            false,
             DateTime.fromISO(created_at),
             DateTime.fromISO(updated_at)
         )
     }
 
+    public setExclusion(excluded: boolean) {
+        this.#excluded = excluded
+    }
+
     private getDurationSincePurchase(date: DateTime): Duration {
-        return date.diff(this.date, this.recurrenceUnit, { conversionAccuracy: 'longterm' })
+        return floorDateTime(date).diff(this.date, this.recurrenceUnit)
     }
 
     private getNextPaymentDate(date: DateTime) {
         const durationSincePurchase = this.getDurationSincePurchase(date)
-        const multiplier = Math.ceil(durationSincePurchase.as(this.recurrenceUnit) / this.every)
-        const advanceBy = this.every * multiplier
-
-        const nextPaymentDate = this.date.plus({ [this.recurrenceUnit]: advanceBy })
-        const nextPaymentFormatted = nextPaymentDate.toFormat('dd MMMM yyyy')
+        const unitsPassed = round(durationSincePurchase.as(this.recurrenceUnit), 3)
+        const nextPaymentDate =
+            unitsPassed % 1 === 0
+                ? floorDateTime(date)
+                : this.date.plus({ [this.recurrenceUnit]: this.every * Math.ceil(unitsPassed / this.every) })
 
         return {
             nextPaymentDate,
             nextPaymentISO: nextPaymentDate.toISO(),
-            nextPaymentFormatted,
+            nextPaymentFormatted: nextPaymentDate.toFormat('dd MMMM yyyy'),
         }
     }
 
@@ -140,6 +157,8 @@ export class DomainTransaction {
     }
 
     public getDueThisMonth(date: DateTime): number {
+        if (this.#excluded) return 0
+
         const { nextPaymentDate } = this.getNextPaymentDate(date)
         const sameMonth = isSameMonth(date.toJSDate(), nextPaymentDate.toJSDate())
         const sameDayOfMonth = date.day === nextPaymentDate.day
@@ -186,13 +205,13 @@ export class DomainTransaction {
             dueThisMonth,
             selectedMonth,
             paid: dueThisMonth === 0,
-            transaction: this.toPlain(),
+            transaction: this,
         }
     }
 
     public toPlain(): Transaction {
         return {
-            id: this.id,
+            id: this.#id,
             label: this.label,
             description: this.description ?? null,
             image_url: this.imageUrl ?? null,
