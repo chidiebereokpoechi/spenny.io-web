@@ -33,9 +33,13 @@ export const TransactionsTable: React.FC<Props> = ({
             <BasicTable
                 columns={[
                     {
-                        Header: 'S/n',
+                        Header: ' ',
                         Cell({ cell }: CellProps<ComputedTransaction>) {
-                            return <span>{cell.row.index + 1}</span>
+                            return (
+                                <div className="flex justify-end">
+                                    <span>{cell.row.index + 1}</span>
+                                </div>
+                            )
                         },
                     },
                     {

@@ -44,7 +44,7 @@ export const WalletsPage: React.FC = observer(() => {
                 )}
                 {wallets.length > 0 ? (
                     <>
-                        <header className="p-8 grid grid-cols-1 gap-4">
+                        <header className="p-4 grid grid-cols-1 gap-4">
                             <span className="text-3xl font-extrabold text-black">Wallets</span>
                             <div>
                                 <PrimaryButton type="button" onClick={openModal}>
@@ -52,14 +52,14 @@ export const WalletsPage: React.FC = observer(() => {
                                 </PrimaryButton>
                             </div>
                         </header>
-                        <main className="p-8 flex flex-wrap overflow-y-auto">
+                        <main className="p-4 flex flex-wrap overflow-y-auto">
                             {wallets.map((wallet) => (
                                 <WalletButton {...wallet} key={wallet.id} onClick={clickWalletButton(wallet)} />
                             ))}
                         </main>
                     </>
                 ) : (
-                    <main className="p-8 flex flex-col flex-1 items-center justify-center space-y-8">
+                    <main className="p-4 flex flex-col flex-1 items-center justify-center space-y-8">
                         <div className="flex flex-col space-y-1 text-center">
                             <span className="text-xl font-bold">You have no wallets</span>
                             <span>They are helpful labels for your transactions</span>

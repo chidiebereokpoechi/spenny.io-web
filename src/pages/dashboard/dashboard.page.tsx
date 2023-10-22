@@ -55,7 +55,7 @@ export const DashboardPage: React.FC = observer(() => {
                 <CreateTrackerModal isOpen={isCreateModalOpen} setIsOpen={setIsCreateModalOpen} />
                 {trackers.length > 0 ? (
                     <>
-                        <header className="p-8 grid grid-cols-1 gap-4">
+                        <header className="p-4 grid grid-cols-1 gap-4">
                             <span className="text-3xl font-extrabold text-black">Trackers</span>
                             <div>
                                 <PrimaryButton type="button" onClick={openModal}>
@@ -63,14 +63,14 @@ export const DashboardPage: React.FC = observer(() => {
                                 </PrimaryButton>
                             </div>
                         </header>
-                        <main className="p-8 grid grid-cols-5 gap-6">
+                        <main className="p-4 grid grid-cols-6 gap-4">
                             {trackers.map((tracker) => (
                                 <TrackerButton {...tracker} key={tracker.id} />
                             ))}
                         </main>
                     </>
                 ) : (
-                    <main className="p-8 flex flex-col flex-1 items-center justify-center space-y-8">
+                    <main className="p-4 flex flex-col flex-1 items-center justify-center space-y-8">
                         <div className="flex flex-col space-y-1 text-center">
                             <span className="text-xl font-bold">You have no trackers</span>
                             <span>You need them to start tracking transactions</span>

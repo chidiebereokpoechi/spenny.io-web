@@ -127,7 +127,7 @@ export const TrackerPage: React.FC = observer(() => {
                 </>
             )}
             <Loader loading={trackersLoading}>
-                <header className="p-6 grid grid-cols-1 gap-4" ref={ref}>
+                <header className="p-4 grid grid-cols-1 gap-4" ref={ref}>
                     <div className="flex justify-between space-x-4">
                         <PrimaryButton type="button" onClick={openEditTrackerModal}>
                             <PencilIcon className="h-3" strokeWidth={2} />

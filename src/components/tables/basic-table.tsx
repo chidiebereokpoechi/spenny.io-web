@@ -15,6 +15,12 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
         []
     )
 
+    const [currentRow, setCurrentRow] = React.useState<number>(-Infinity)
+
+    const highlightRow = (index: number) => () => {
+        setCurrentRow(index)
+    }
+
     const { getTableBodyProps, getTableProps, footerGroups, headerGroups, prepareRow, page }: TableInstance<T> =
         useTable<T>(
             {
@@ -44,25 +50,33 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
                                     <th
                                         {...column.getHeaderProps(column.getSortByToggleProps())}
                                         className={classNames(
-                                            'font-[500] sticky top-0 py-2 first:pl-6 last:pr-6 border-r-2 border-slate-300 last:border-r-0',
-                                            'px-3 m-0 text-left',
+                                            'font-[500] sticky top-0 py-1 first:pl-4 last:pr-4 border-r-2 border-slate-300 last:border-r-0',
+                                            'px-2 m-0 text-left',
                                             column.isSorted ? 'bg-slate-300' : 'bg-slate-200'
                                         )}
                                     >
                                         <div className="flex flex-shrink-0 space-x-2 justify-between items-center">
                                             <span>{column.render('Header')}</span>
-                                            {column.isSorted ? (
-                                                column.isSortedDesc ? (
-                                                    <ArrowLongDownIcon className="!h-3 flex-shrink-0" strokeWidth={2} />
+                                            {column.canSort ? (
+                                                column.isSorted ? (
+                                                    column.isSortedDesc ? (
+                                                        <ArrowLongDownIcon
+                                                            className="!h-3 flex-shrink-0"
+                                                            strokeWidth={2}
+                                                        />
+                                                    ) : (
+                                                        <ArrowLongUpIcon
+                                                            className="!h-3 flex-shrink-0"
+                                                            strokeWidth={2}
+                                                        />
+                                                    )
                                                 ) : (
-                                                    <ArrowLongUpIcon className="!h-3 flex-shrink-0" strokeWidth={2} />
+                                                    <ArrowsUpDownIcon
+                                                        className="!h-3 flex-shrink-0 text-slate-300"
+                                                        strokeWidth={2}
+                                                    />
                                                 )
-                                            ) : (
-                                                <ArrowsUpDownIcon
-                                                    className="!h-3 flex-shrink-0 text-slate-300"
-                                                    strokeWidth={2}
-                                                />
-                                            )}
+                                            ) : null}
                                         </div>
                                         {/* {!isLast && (
                                             <div
@@ -88,11 +102,13 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
                                         // TD
                                         <td
                                             {...cell.getCellProps()}
+                                            onPointerEnter={highlightRow(row.index)}
                                             key={j}
                                             className={classNames(
-                                                'px-3 m-0 text-left',
+                                                'px-2 m-0 text-left',
                                                 cell.column.isSorted ? 'bg-slate-200' : 'bg-slate-50',
-                                                'border-b-2 border-slate-300/50 border-r-2 font-normal text-[11px] text-accent-2 py-2 first:pl-6 last:pr-6 last:border-r-0'
+                                                currentRow === row.index ? 'bg-slate-200/30' : 'bg-slate-50',
+                                                'border-b-2 border-slate-300/50 border-r-2 font-normal text-[11px] text-accent-2 py-2 first:pl-4 last:pr-4 last:border-r-0'
                                             )}
                                         >
                                             {cell.render('Cell')}
@@ -112,8 +128,8 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
                                     <td
                                         {...column.getFooterProps()}
                                         className={classNames(
-                                            'bg-slate-100 px-3 m-0 text-left shadow-md',
-                                            'border-slate-300/50 border-r-2 font-normal text-[11px] text-accent-2 sticky bottom-0 py-2 last:pr-8 last:border-r-0'
+                                            'bg-slate-100 px-2 m-0 text-left shadow-md',
+                                            'border-slate-300/50 border-r-2 font-normal text-[11px] text-accent-2 sticky bottom-0 py-2 first:pl-4 last:pr-4 last:border-r-0'
                                         )}
                                     >
                                         {footer}
