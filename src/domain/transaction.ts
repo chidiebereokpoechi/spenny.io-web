@@ -1,4 +1,4 @@
-import { endOfMonth, isSameMonth } from 'date-fns'
+import { isSameMonth, startOfMonth } from 'date-fns'
 import { map, orderBy, round } from 'lodash'
 import { DateTime, Duration } from 'luxon'
 import { ComputedTransaction, Transaction, Wallet } from '../models/response'
@@ -130,12 +130,12 @@ export class DomainTransaction {
         this.#excluded = excluded
     }
 
-    private getDurationSincePurchase(date: DateTime): Duration {
+    private getDurationSincePurchase(date: DateTime, why?: string): Duration {
         return floorDateTime(date).diff(this.date, this.recurrenceUnit)
     }
 
-    private getNextPaymentDate(date: DateTime) {
-        const durationSincePurchase = this.getDurationSincePurchase(date)
+    private getNextPaymentDate(date: DateTime, why?: string) {
+        const durationSincePurchase = this.getDurationSincePurchase(date, why)
         const unitsPassed = round(durationSincePurchase.as(this.recurrenceUnit), 3)
         const nextPaymentDate =
             unitsPassed % 1 === 0
@@ -150,8 +150,8 @@ export class DomainTransaction {
     }
 
     public getAmountForSelectedMonth(date: DateTime): number {
-        const endDate = DateTime.fromJSDate(endOfMonth(date.toJSDate())).minus({ month: 1 })
-        const { nextPaymentDate } = this.getNextPaymentDate(endDate)
+        const endDate = DateTime.fromJSDate(startOfMonth(date.toJSDate()))
+        const { nextPaymentDate } = this.getNextPaymentDate(endDate, 'Selected month')
         const sameMonth = isSameMonth(date.toJSDate(), nextPaymentDate.toJSDate())
         return sameMonth && this.isActive ? this.amount : 0
     }
@@ -159,7 +159,7 @@ export class DomainTransaction {
     public getDueThisMonth(date: DateTime): number {
         if (this.#excluded) return 0
 
-        const { nextPaymentDate } = this.getNextPaymentDate(date)
+        const { nextPaymentDate } = this.getNextPaymentDate(date, 'Due this month')
         const sameMonth = isSameMonth(date.toJSDate(), nextPaymentDate.toJSDate())
         const sameDayOfMonth = date.day === nextPaymentDate.day
 
@@ -182,7 +182,7 @@ export class DomainTransaction {
     public computeForDate(date: DateTime): ComputedTransaction {
         const { categories, categoriesValue } = this.orderedCategories
         const { recurs, recurrenceValue } = this.recurrence
-        const { nextPaymentISO: nextPayment, nextPaymentFormatted } = this.getNextPaymentDate(date)
+        const { nextPaymentISO: nextPayment, nextPaymentFormatted } = this.getNextPaymentDate(date, 'Computed')
         const dueThisMonth = this.getDueThisMonth(date)
         const selectedMonth = this.getAmountForSelectedMonth(date)
 

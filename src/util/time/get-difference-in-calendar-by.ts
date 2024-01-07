@@ -1,11 +1,6 @@
-import {
-    differenceInCalendarDays,
-    differenceInCalendarMonths,
-    differenceInCalendarWeeks,
-    differenceInCalendarYears,
-} from 'date-fns'
-import { RecurrenceUnit } from '../constants'
+import { differenceInCalendarMonths, differenceInDays, differenceInWeeks } from 'date-fns'
 import { DateTime } from 'luxon'
+import { RecurrenceUnit } from '../constants'
 
 export const getDifferenceInCalendarUnits = (from: DateTime, to: DateTime, unit: RecurrenceUnit): number => {
     const fromDate = from.toJSDate()
@@ -13,15 +8,23 @@ export const getDifferenceInCalendarUnits = (from: DateTime, to: DateTime, unit:
     return getDifferenceInCalendarBy(unit)(toDate, fromDate)
 }
 
+const differenceInYears = (toDate: Date, fromDate: Date) => {
+    return toDate.getFullYear() - fromDate.getFullYear()
+}
+
+const differenceInMonths = (toDate: Date, fromDate: Date) => {
+    return differenceInCalendarMonths(toDate, fromDate)
+}
+
 const getDifferenceInCalendarBy = (unit: RecurrenceUnit) => {
     switch (unit) {
         case RecurrenceUnit.Day:
-            return differenceInCalendarDays
+            return differenceInDays
         case RecurrenceUnit.Month:
-            return differenceInCalendarMonths
+            return differenceInMonths
         case RecurrenceUnit.Week:
-            return differenceInCalendarWeeks
+            return differenceInWeeks
         default:
-            return differenceInCalendarYears
+            return differenceInYears
     }
 }
