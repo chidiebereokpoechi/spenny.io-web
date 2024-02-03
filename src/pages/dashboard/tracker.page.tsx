@@ -3,7 +3,7 @@ import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { PrimaryButton } from '../../components/buttons'
-import { DateInput, SelectInput } from '../../components/input'
+import { DateInput, SelectInput, TextInput } from '../../components/input'
 import { DashboardPageWrapper, Loader } from '../../components/layout'
 import { DomainTransaction } from '../../domain'
 import { Category } from '../../models/response'
@@ -11,6 +11,7 @@ import useDimensions from '../../util/misc/dimensions'
 import { useStores } from '../../util/stores'
 import { TransactionsTable } from './components/transactions-table'
 import { CreateTransactionModal, UpdateCategoryModal, UpdateTrackerModal, UpdateTransactionModal } from './modals'
+import { sample } from 'lodash'
 
 export const TrackerPage: React.FC = observer(() => {
     const { id } = useParams()
@@ -30,6 +31,7 @@ export const TrackerPage: React.FC = observer(() => {
     const transactionsLoading = transactionsStore.loading
     const ready = trackersStore.ready
     const date = transactionsStore.date
+    const nameFilter = transactionsStore.nameFilter
     const [activeCategory, setActiveCategory] = useState<Category | null>(null)
     const [activeTransaction, setActiveTransaction] = useState<DomainTransaction | null>(null)
 
@@ -59,6 +61,10 @@ export const TrackerPage: React.FC = observer(() => {
         return () => {
             transactionsStore.setTransactionExclusion(transaction, excluded)
         }
+    }
+
+    const setNameFilter = (search: string) => {
+        transactionsStore.setFilter(search)
     }
 
     const selectDate = (date: Date) => {
@@ -142,6 +148,25 @@ export const TrackerPage: React.FC = observer(() => {
                     </div>
                     <div className="flex space-x-4">
                         <div className="w-[300px]">
+                            <TextInput
+                                label="Filter by name"
+                                name="search"
+                                alwaysShowLabel
+                                placeholder={sample([
+                                    'Amazon Prime',
+                                    'Spotify',
+                                    'Netflix',
+                                    'Groceries',
+                                    'Rent',
+                                    'Salary',
+                                    'Investment',
+                                    'Savings',
+                                ])}
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
+                            />
+                        </div>
+                        <div className="w-[300px]">
                             <DateInput
                                 label="Select date"
                                 name="date"
@@ -156,7 +181,7 @@ export const TrackerPage: React.FC = observer(() => {
                                 label="Filter by wallets"
                                 placeholder="Select wallets"
                                 multiple
-                                disableHideLabel
+                                alwaysShowLabel
                                 options={wallets}
                                 accessor={{ display: 'label', value: 'id' }}
                                 onChange={selectWallets}

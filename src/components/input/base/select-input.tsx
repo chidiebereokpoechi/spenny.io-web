@@ -9,7 +9,7 @@ import { usePopper } from 'react-popper'
 export interface SelectInputProps<T> {
     name: string
     className?: string
-    disableHideLabel?: boolean
+    alwaysShowLabel?: boolean
     label: string
     errors?: string[]
     placeholder?: string
@@ -27,7 +27,7 @@ export interface SelectInputProps<T> {
 export const SelectInput = <T,>({
     name,
     className,
-    disableHideLabel,
+    alwaysShowLabel: disableHideLabel,
     label,
     errors,
     placeholder,
