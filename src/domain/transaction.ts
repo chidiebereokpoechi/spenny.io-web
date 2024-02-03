@@ -142,6 +142,8 @@ export class DomainTransaction {
     }
 
     public getAmountForSelectedMonth(date: DateTime): number {
+        if (this.#excluded) return 0
+
         const endDate = DateTime.fromJSDate(startOfMonth(date.toJSDate()))
         const { nextPaymentDate } = this.getNextPaymentDate(endDate, 'Selected month')
         const sameMonth = isSameMonth(date.toJSDate(), nextPaymentDate.toJSDate())
