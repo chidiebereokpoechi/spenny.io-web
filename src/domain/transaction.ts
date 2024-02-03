@@ -1,9 +1,10 @@
 import { isSameMonth, startOfMonth } from 'date-fns'
-import { map, orderBy, round } from 'lodash'
+import { map, orderBy } from 'lodash'
 import { DateTime, Duration } from 'luxon'
 import { ComputedTransaction, Transaction, Wallet } from '../models/response'
 import { RecurrenceUnit, TransactionStatus, TransactionType } from '../util/constants'
 import { describeRecurrence, floorDateTime } from '../util/time'
+import { calculateNextPaymentDate } from '../util/time/advance'
 import { DomainCategory } from './category'
 import { TransactionFilter } from './transaction-filter'
 
@@ -115,7 +116,7 @@ export class DomainTransaction {
             status,
             type,
             amount,
-            floorDateTime(DateTime.fromISO(date)),
+            floorDateTime(DateTime.fromISO(date).setZone('utc', { keepLocalTime: true })),
             every,
             recurrence_unit,
             map(categories, DomainCategory.fromPlain),
@@ -130,17 +131,8 @@ export class DomainTransaction {
         this.#excluded = excluded
     }
 
-    private getDurationSincePurchase(date: DateTime, why?: string): Duration {
-        return floorDateTime(date).diff(this.date, this.recurrenceUnit)
-    }
-
     private getNextPaymentDate(date: DateTime, why?: string) {
-        const durationSincePurchase = this.getDurationSincePurchase(date, why)
-        const unitsPassed = round(durationSincePurchase.as(this.recurrenceUnit), 3)
-        const nextPaymentDate =
-            unitsPassed % 1 === 0
-                ? floorDateTime(date)
-                : this.date.plus({ [this.recurrenceUnit]: this.every * Math.ceil(unitsPassed / this.every) })
+        const nextPaymentDate = calculateNextPaymentDate(this.date, date, this.every, this.recurrenceUnit)
 
         return {
             nextPaymentDate,
@@ -196,7 +188,8 @@ export class DomainTransaction {
             wallet: this.wallet,
             walletValue: this.wallet?.id,
             amount: this.amount,
-            date: this.date.toISO(),
+            started: this.date.toISO(),
+            startedFormatted: this.date.toFormat('dd MMMM yyyy'),
             recurs,
             recurrenceValue,
             nextPayment,

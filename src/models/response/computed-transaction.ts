@@ -11,7 +11,8 @@ export interface ComputedTransaction {
     categories: Transaction['categories']
     categoriesValue: string
     amount: number
-    date: string
+    started: string
+    startedFormatted: string
     recurs: string
     recurrenceValue: number
     nextPayment: string

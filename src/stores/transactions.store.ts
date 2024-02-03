@@ -8,6 +8,7 @@ import { Transaction, TransactionAggregate } from '../models/response'
 import { HttpMethod, TransactionType } from '../util/constants'
 import { Resettable, dehydrateToStorage, hydrateFromStorage } from '../util/misc'
 import { request } from '../util/request'
+import { floorDateTime } from '../util/time'
 
 const TRANSACTIONS_KEY = 'SPENNY.IO:TRANSACTIONS'
 
@@ -25,6 +26,11 @@ export class TransactionsStore implements Resettable {
         this.setUp()
     }
 
+    private get currentDate() {
+        const date = DateTime.fromJSDate(this.date).toUTC(0)
+        return floorDateTime(date)
+    }
+
     private get filterInput() {
         return {
             name: this.nameFilter,
@@ -35,7 +41,7 @@ export class TransactionsStore implements Resettable {
     private getAggregate(): TransactionAggregate {
         const transactions = map(
             filter(this.transactions, (transaction) => transaction.filter(this.filterInput)),
-            (transaction) => transaction.computeForDate(DateTime.fromJSDate(this.date))
+            (transaction) => transaction.computeForDate(this.currentDate)
         )
 
         const expenses = filter(transactions, { type: TransactionType.Expense })

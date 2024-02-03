@@ -153,11 +153,6 @@ export const TransactionsTable: React.FC<Props> = ({
                                 </div>
                             )
                         },
-                        Footer() {
-                            const [income, expenses, net] = (aggregate as TransactionAggregate).totalAmount
-
-                            return <NetAmount {...{ income, expenses, net }} />
-                        },
                     },
                     {
                         Header: 'Selected month amount',
@@ -183,6 +178,14 @@ export const TransactionsTable: React.FC<Props> = ({
                         Cell({ cell }: CellProps<ComputedTransaction>) {
                             const { recurs } = cellValue(cell)
                             return <span className="whitespace-pre">{recurs}</span>
+                        },
+                    },
+                    {
+                        Header: 'Started',
+                        accessor: 'started',
+                        Cell({ cell }: CellProps<ComputedTransaction>) {
+                            const { startedFormatted } = cellValue(cell)
+                            return <span>{startedFormatted}</span>
                         },
                     },
                     {
