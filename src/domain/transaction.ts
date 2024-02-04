@@ -154,11 +154,10 @@ export class DomainTransaction {
         if (this.#excluded) return 0
 
         const { nextPaymentDate } = this.getNextPaymentDate(date, 'Due this month')
-        const sameMonth = isSameMonth(date.toJSDate(), nextPaymentDate.toJSDate())
-        const sameDayOfMonth = date.day === nextPaymentDate.day
+        const inTheSameMonth = date.month === nextPaymentDate.month && date.year === nextPaymentDate.year
 
         if (this.type === TransactionType.Expense && this.isActive) {
-            if (sameMonth || (!sameMonth && sameDayOfMonth)) return this.amount
+            if (inTheSameMonth && nextPaymentDate >= date) return this.amount
         }
 
         return 0
