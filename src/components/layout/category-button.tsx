@@ -18,7 +18,7 @@ export const CategoryButton: React.FC<CategoryButtonProps> = ({
         <motion.button
             className={classNames(
                 className,
-                'bg-white flex-shrink-0 rounded-lg shadow-lg inline-flex flex-col justify-center items-center overflow-hidden mb-6 mr-6 cursor-pointer'
+                'bg-white flex-shrink-0 rounded-lg shadow-lg inline-flex flex-col justify-center items-center overflow-hidden mb-4 mr-4 cursor-pointer'
             )}
             style={{
                 background: background_color,

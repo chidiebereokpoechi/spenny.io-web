@@ -125,7 +125,7 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
                 <Listbox value={value} onChange={select} multiple name={name} as="div" className="flex w-full relative">
                     <Listbox.Button
                         className={classNames(
-                            'flex items-center w-full py-2.5 border-[2px] bg-slate-50 px-5 text-xs rounded-lg',
+                            'flex items-center w-full py-2 border-[2px] bg-slate-50 px-3 text-xs rounded-lg',
                             'outline-none focus:ring-4 cursor-pointer',
                             invalid
                                 ? 'hover:border-red-900/20 focus:border-red-600 ring-red-600/20 text-red-600 placeholder:text-red-400 border-red-200'
@@ -138,7 +138,7 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
                         {showPlaceholder ? (
                             <span className="text-slate-400">{placeholder}</span>
                         ) : (
-                            <div className="flex flex-wrap -mx-2 -mb-2">
+                            <div className="flex flex-wrap -mx-1 -mb-2">
                                 {(value as any[]).map((selection) => (
                                     <MiniCategoryButton {...categoriesMap[selection]} key={selection} />
                                 ))}
@@ -172,7 +172,7 @@ const Input: React.FC<CategoriesSelectInputProps> = ({
                                                 active && (selected ? 'bg-primary-dark' : 'bg-slate-200'),
                                                 selected &&
                                                     'bg-primary text-white focus:bg-primary-dark active:bg-primary-dark hover:!bg-primary-dark',
-                                                'cursor-pointer h-10 w-full px-5 py-1 flex items-center ring-inset !ring-0 hover:bg-slate-100'
+                                                'cursor-pointer w-full px-3 py-1 flex items-center ring-inset !ring-0 hover:bg-slate-100'
                                             )}
                                         >
                                             {selected && <CheckIcon className="h-3 mr-2" strokeWidth={2} />}

@@ -1,5 +1,6 @@
 export * from './categories-select-input'
 export * from './color-input'
+export * from './custom-button-select-input'
 export * from './date-input'
 export * from './numerical-input'
 export * from './select-input'

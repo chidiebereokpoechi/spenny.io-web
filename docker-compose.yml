@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL:-}
+    image: spenny-io-web:latest
+    container_name: spenny-io-web
+    ports:
+      - "3335:80"
+    restart: unless-stopped

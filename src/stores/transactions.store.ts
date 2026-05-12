@@ -1,91 +1,83 @@
-import { addDays, addMonths, addWeeks, addYears, isSameMonth } from 'date-fns'
-import { capitalize, map, orderBy } from 'lodash'
-import { DateTime, Duration } from 'luxon'
-import { action, computed, makeAutoObservable, runInAction } from 'mobx'
+import { every, filter, map, orderBy, remove, sum } from 'lodash'
+import { DateTime } from 'luxon'
+import { action, makeAutoObservable, runInAction } from 'mobx'
 import { tap } from 'rxjs'
+import { DomainTransaction } from '../domain'
 import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
-import { ComputedTransaction, Transaction } from '../models/response'
-import { HttpMethod, RecurrenceUnit, recurrenceUnitWordVariantMap } from '../util/constants'
-import { dehydrateToStorage, hydrateFromStorage, Resettable } from '../util/misc'
+import { Transaction, TransactionAggregate } from '../models/response'
+import { HttpMethod, TransactionType } from '../util/constants'
+import { Resettable, dehydrateToStorage, hydrateFromStorage } from '../util/misc'
 import { request } from '../util/request'
+import { floorDateTime } from '../util/time'
 
 const TRANSACTIONS_KEY = 'SPENNY.IO:TRANSACTIONS'
 
 export class TransactionsStore implements Resettable {
-    public transactions: Transaction[] = []
+    public transactions: DomainTransaction[] = []
+    public aggregate: Nullable<TransactionAggregate> = null
     public loading: boolean = false
     public ready: boolean = false
-
-    @computed
-    public get computedTransactions(): ComputedTransaction[] {
-        return map(this.transactions, this.transformTransaction)
-    }
+    public date: Date = new Date()
+    public nameFilter: string = ''
+    public wallets: number[] = []
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
         this.setUp()
     }
 
-    private describeRecurrence(amount: number, unit: RecurrenceUnit): string {
-        const variants = recurrenceUnitWordVariantMap[unit]
-
-        if (amount === 1) {
-            return capitalize(variants.period)
-        }
-
-        return `Every ${amount} ${variants.plural}`
+    private get currentDate() {
+        const date = DateTime.fromJSDate(this.date).toUTC(0)
+        return floorDateTime(date)
     }
 
-    private getAddDateFunction(unit: RecurrenceUnit) {
-        switch (unit) {
-            case RecurrenceUnit.Day:
-                return addDays
-            case RecurrenceUnit.Month:
-                return addMonths
-            case RecurrenceUnit.Week:
-                return addWeeks
-            default:
-                return addYears
-        }
-    }
-
-    private transformTransaction(transaction: Transaction): ComputedTransaction {
-        const unit = transaction.recurrence_unit
-        const dateOfPurchase = DateTime.fromISO(transaction.date)
-        const durationSincePurchase = DateTime.fromMillis(Date.now()).diff(dateOfPurchase, unit, {
-            conversionAccuracy: 'longterm',
-        })
-
-        const addFunction = this.getAddDateFunction(unit)
-        const multiplier = Math.ceil(durationSincePurchase.as(transaction.recurrence_unit) / transaction.every)
-        const nextPaymentDate = addFunction(dateOfPurchase.toJSDate(), transaction.every * multiplier)
-        const nextPaymentFormatted = DateTime.fromJSDate(nextPaymentDate).toFormat('dd MMMM yyyy')
-        const sameMonth = isSameMonth(new Date(), nextPaymentDate)
-        const dueThisMonth = sameMonth ? transaction.amount : 0
-        const sortedCategories = orderBy(transaction.categories, 'label')
-
+    private get filterInput() {
         return {
-            label: transaction.label,
-            description: transaction.description,
-            categories: sortedCategories,
-            categoriesValue: map(sortedCategories, 'label.0').join(''),
-            type: transaction.type,
-            amount: transaction.amount,
-            date: transaction.date,
-            recurs: this.describeRecurrence(transaction.every, unit),
-            recurrenceValue: Duration.fromObject({ [unit]: transaction.every }).toMillis(),
-            nextPayment: nextPaymentDate.toISOString(),
-            nextPaymentFormatted: nextPaymentFormatted,
-            dueThisMonth,
-            paid: dueThisMonth === 0,
-            transaction,
+            name: this.nameFilter,
+            wallets: this.wallets,
         }
+    }
+
+    private getAggregate(): TransactionAggregate {
+        const transactions = map(
+            filter(this.transactions, (transaction) => transaction.filter(this.filterInput)),
+            (transaction) => transaction.computeForDate(this.currentDate)
+        )
+
+        const expenses = filter(transactions, { type: TransactionType.Expense })
+        const income = filter(transactions, { type: TransactionType.Income })
+
+        const totalExpenses = sum(map(expenses, 'amount'))
+        const totalIncome = sum(map(income, 'amount'))
+        const totalNet = totalIncome - totalExpenses
+
+        const selectedMonthExpenses = sum(map(expenses, 'selectedMonth'))
+        const selectedMonthIncome = sum(map(income, 'selectedMonth'))
+        const selectedMonthNet = selectedMonthIncome - selectedMonthExpenses
+
+        const aggregate: TransactionAggregate = {
+            transactions: orderBy(transactions, 'paid'),
+            dueThisMonth: sum(map(transactions, 'dueThisMonth')),
+            leastExpensiveMonth: ['January', 20], // TODO: remove stub
+            mostExpensiveMonth: ['January', 20], // TODO: remove stub
+            paidThisMonth: every(transactions, 'paid'),
+            totalAmount: [totalIncome, totalExpenses, totalNet],
+            totalSelectedMonth: [selectedMonthIncome, selectedMonthExpenses, selectedMonthNet],
+        }
+
+        return aggregate
     }
 
     @action
     public setUp(): void {
         this.transactions = hydrateFromStorage(TRANSACTIONS_KEY) ?? []
         this.ready = true
+    }
+
+    @action
+    public setTransactionExclusion(transaction: DomainTransaction, excluded: boolean) {
+        transaction.setExclusion(excluded)
+        this.aggregate = this.getAggregate()
     }
 
     @action
@@ -127,6 +119,23 @@ export class TransactionsStore implements Resettable {
     }
 
     @action
+    public deleteTransaction(id: number) {
+        this.loading = true
+
+        return request<never>(`/transactions/${id}`, HttpMethod.Delete, {}).pipe(
+            tap((response) => {
+                runInAction(() => {
+                    this.loading = false
+
+                    if (response.ok) {
+                        remove(this.transactions, { id })
+                    }
+                })
+            })
+        )
+    }
+
+    @action
     public listTransactionsForTracker(trackerId: number) {
         this.transactions = []
         this.ready = false
@@ -139,7 +148,8 @@ export class TransactionsStore implements Resettable {
                     this.loading = false
 
                     if (response.data) {
-                        this.setTransactions(response.data)
+                        const transactions = map(response.data, DomainTransaction.fromPlain)
+                        this.setTransactions(transactions)
                     }
                 })
             })
@@ -147,9 +157,28 @@ export class TransactionsStore implements Resettable {
     }
 
     @action
-    public setTransactions(transactions: Transaction[]): void {
+    public setTransactions(transactions: DomainTransaction[]): void {
         this.transactions = transactions
+        this.aggregate = this.getAggregate()
         dehydrateToStorage(TRANSACTIONS_KEY, transactions)
+    }
+
+    @action
+    public setDate(date: Date): void {
+        this.date = date
+        this.aggregate = this.getAggregate()
+    }
+
+    @action
+    public setWallets(wallets: number[]): void {
+        this.wallets = wallets
+        this.aggregate = this.getAggregate()
+    }
+
+    @action
+    public setFilter(filter: string): void {
+        this.nameFilter = filter
+        this.aggregate = this.getAggregate()
     }
 
     @action

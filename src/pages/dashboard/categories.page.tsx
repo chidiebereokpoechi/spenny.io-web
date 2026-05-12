@@ -44,7 +44,7 @@ export const CategoriesPage: React.FC = observer(() => {
                 )}
                 {categories.length > 0 ? (
                     <>
-                        <header className="p-8 grid grid-cols-1 gap-4">
+                        <header className="p-4 grid grid-cols-1 gap-4">
                             <span className="text-3xl font-extrabold text-black">Categories</span>
                             <div>
                                 <PrimaryButton type="button" onClick={openModal}>
@@ -52,7 +52,7 @@ export const CategoriesPage: React.FC = observer(() => {
                                 </PrimaryButton>
                             </div>
                         </header>
-                        <main className="p-8 flex flex-wrap overflow-y-auto">
+                        <main className="p-4 flex flex-wrap overflow-y-auto">
                             {categories.map((category) => (
                                 <CategoryButton
                                     {...category}
@@ -63,7 +63,7 @@ export const CategoriesPage: React.FC = observer(() => {
                         </main>
                     </>
                 ) : (
-                    <main className="p-8 flex flex-col flex-1 items-center justify-center space-y-8">
+                    <main className="p-4 flex flex-col flex-1 items-center justify-center space-y-8">
                         <div className="flex flex-col space-y-1 text-center">
                             <span className="text-xl font-bold">You have no categories</span>
                             <span>They are helpful labels for your transactions</span>

@@ -12,7 +12,7 @@ export const ValidationMessage: React.FC<Props> = ({ message, type }) => {
             className={classNames(
                 type === 'error' && 'text-red-800 border-red-200 bg-red-100',
                 type === 'info' && 'text-slate-800 border-slate-100 bg-slate-50',
-                'border-[2px] rounded px-5 py-2 font-bold'
+                'border-[2px] rounded px-3 py-1 font-bold'
             )}
         >
             <span>{message}</span>

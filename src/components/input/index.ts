@@ -1,6 +1,7 @@
 export * from './base'
 export * from './form-categories-select-input'
 export * from './form-color-input'
+export * from './form-custom-button-select-input'
 export * from './form-date-input'
 export * from './form-numerical-input'
 export * from './form-select-input'

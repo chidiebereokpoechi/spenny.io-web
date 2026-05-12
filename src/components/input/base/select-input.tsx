@@ -9,6 +9,7 @@ import { usePopper } from 'react-popper'
 export interface SelectInputProps<T> {
     name: string
     className?: string
+    alwaysShowLabel?: boolean
     label: string
     errors?: string[]
     placeholder?: string
@@ -26,6 +27,7 @@ export interface SelectInputProps<T> {
 export const SelectInput = <T,>({
     name,
     className,
+    alwaysShowLabel: disableHideLabel,
     label,
     errors,
     placeholder,
@@ -42,7 +44,7 @@ export const SelectInput = <T,>({
     const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
     const [popperElement, setPopperElement] = useState<any>(null)
     const { styles, attributes } = usePopper(referenceElement, popperElement, {
-        placement: 'top',
+        placement: 'bottom',
         strategy: 'fixed',
         modifiers: [
             {
@@ -95,7 +97,7 @@ export const SelectInput = <T,>({
 
     return (
         <div className={classNames(className, 'grid grid-cols-1 gap-2 ring-0')}>
-            {!showPlaceholder && (
+            {(!showPlaceholder || disableHideLabel) && (
                 <label htmlFor={name} className="text-xs text-slate-500">
                     {label}
                 </label>
@@ -110,7 +112,7 @@ export const SelectInput = <T,>({
             >
                 <Listbox.Button
                     className={classNames(
-                        'flex items-center w-full py-2.5 border-[2px] bg-slate-50 px-5 text-xs rounded-lg',
+                        'flex items-center w-full py-2 border-[2px] bg-slate-50 px-3 text-xs rounded-lg',
                         'outline-none focus:ring-4',
                         invalid
                             ? 'hover:border-red-900/20 focus:border-red-600 ring-red-600/20 text-red-600 placeholder:text-red-400 border-red-200'
@@ -122,9 +124,12 @@ export const SelectInput = <T,>({
                 >
                     {showPlaceholder && <span className="text-slate-400">{placeholder}</span>}
                     {!showPlaceholder && multiple && (
-                        <div className="flex flex-wrap -mx-2 -mb-2">
+                        <div className="flex flex-wrap -mx-1 -mb-2">
                             {(value as any[]).map((selection, i) => (
-                                <span className="bg-slate-200 py-1 px-2 rounded shadow-sm mr-2 mb-2" key={i}>
+                                <span
+                                    className="bg-slate-200 h-4 py-0 px-2 rounded shadow-sm mr-2 mb-2 text-[.6rem]"
+                                    key={i}
+                                >
                                     {optionsMap[selection].label}
                                 </span>
                             ))}
@@ -151,7 +156,7 @@ export const SelectInput = <T,>({
                                         active && (selected ? 'bg-primary-dark' : 'bg-slate-200'),
                                         selected &&
                                             'bg-primary text-white focus:bg-primary-dark active:bg-primary-dark hover:!bg-primary-dark',
-                                        'cursor-pointer h-10 w-full px-5 py-1 flex items-center ring-inset !ring-0 hover:bg-slate-100'
+                                        'cursor-pointer w-full px-3 py-1 flex items-center ring-inset !ring-0 hover:bg-slate-100'
                                     )}
                                 >
                                     {selected && <CheckIcon className="h-3 mr-2" strokeWidth={2} />}
