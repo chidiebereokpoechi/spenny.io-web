@@ -1,46 +1,106 @@
-# Getting Started with Create React App
+# spenny.io-web
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The web frontend for **spenny.io**, a personal finance tracker. Users organize
+their finances into **trackers** containing recurring **transactions** (income
+and expenses), grouped by **categories** and tied to **wallets**.
 
-## Available Scripts
+The app computes per-month totals, due-this-month projections, and next-payment
+dates from each transaction's recurrence schedule, so users can see what bills
+are still outstanding for the current period and what the month's net cash flow
+looks like.
 
-In the project directory, you can run:
+## Stack
 
-### `npm start`
+- React 18 + TypeScript (Create React App)
+- MobX for state management
+- React Router 6 for routing
+- RxJS for HTTP (via `rxjs/ajax`)
+- Formik + `class-validator` for forms and validation
+- Tailwind CSS for styling
+- Headless UI, Heroicons, Framer Motion, React Table, React Datepicker
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The backend is a separate service; this app talks to it via `REACT_APP_API_BASE_URL`.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+- Node.js 20
+- npm
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup
 
-### `npm run build`
+```sh
+npm install
+cp .env.example .env   # then edit REACT_APP_API_BASE_URL to point at your API
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`.env.example`:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+PORT=4000
+REACT_APP_API_BASE_URL="http://localhost:5000/api/v1"
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Scripts
 
-### `npm run eject`
+| Command         | What it does                                                  |
+| --------------- | ------------------------------------------------------------- |
+| `npm start`     | Runs the dev server (defaults to the `PORT` env var).         |
+| `npm run build` | Production build into `build/`.                               |
+| `npm test`      | Jest in watch mode (CRA defaults).                            |
+| `npm run lint`  | `tsc --noEmit` then ESLint over `src/**/*.{ts,tsx}`.          |
+| `npm run format`| Prettier-write `src/**/*.{ts,tsx}`.                           |
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Docker
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+A multi-stage `Dockerfile` builds the app and serves it via nginx.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```sh
+# Build and run via docker compose
+REACT_APP_API_BASE_URL="https://api.example.com/api/v1" docker compose up --build
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+The compose service exposes the app on `http://localhost:3335`. The API base
+URL is baked in at build time (it's a `REACT_APP_*` var), so rebuild the image
+when it changes.
 
-## Learn More
+## Project layout
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+src/
+  app.tsx                # Root component (wires the Router)
+  index.tsx              # Entry point
+  pages/                 # Route-level pages (auth, dashboard, tracker, ...)
+  components/            # Reusable UI: buttons, inputs, layout, modals, tables
+  stores/                # MobX stores (auth, user, wallets, categories,
+                         #   trackers, transactions)
+  domain/                # Domain classes (e.g. DomainTransaction) — the
+                         #   computation/filter logic lives here, not in stores
+  models/
+    request/             # Outgoing request models (class-validator decorated)
+    response/            # Plain response shapes from the API
+  util/
+    constants/           # Enums + option lists (TransactionType, RouteLink, ...)
+    request.ts           # The shared HTTP wrapper (RxJS ajax + auth token)
+    stores.ts            # Store registry + useStores() hook
+    time/                # Recurrence math (next payment date, floor/ceil, ...)
+    validation/          # validateModel + custom class-validator decorators
+    formatting/          # Currency and date formatters
+    misc/                # Storage hydration, dimensions hook, etc.
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Conventions
+
+- **Formatting**: Prettier, 4-space indent, single quotes, no semicolons, 120
+  cols. Run `npm run format` before pushing.
+- **Linting**: `npm run lint` (typecheck + ESLint, airbnb-typescript base).
+- **State**: MobX stores in `src/stores/`. Use `useStores()` to access them.
+  Mutations go through `@action` methods.
+- **HTTP**: never call `fetch`/`ajax` directly — go through
+  [src/util/request.ts](src/util/request.ts), which handles the auth header,
+  base URL, and error shaping.
+- **Forms**: build a request model in `src/models/request/` with
+  `class-validator` decorators, then use Formik + `validateModel` to drive the
+  form.
+- **Domain logic**: anything more than trivial computation on a transaction
+  (filtering, next-payment date, monthly totals) belongs on the
+  `DomainTransaction` class, not in components or stores.
