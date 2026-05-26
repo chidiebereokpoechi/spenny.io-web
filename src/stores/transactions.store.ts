@@ -5,7 +5,7 @@ import { tap } from 'rxjs'
 import { DomainTransaction } from '../domain'
 import { CreateTransactionModel, UpdateTransactionModel } from '../models/request'
 import { Transaction, TransactionAggregate } from '../models/response'
-import { HttpMethod, TransactionType } from '../util/constants'
+import { HttpMethod, TransactionStatus, TransactionType } from '../util/constants'
 import { Resettable, dehydrateToStorage, hydrateFromStorage } from '../util/misc'
 import { request } from '../util/request'
 import { floorDateTime } from '../util/time'
@@ -21,6 +21,7 @@ export class TransactionsStore implements Resettable {
     public nameFilter: string = ''
     public wallets: number[] = []
     public types: TransactionType[] = []
+    public statuses: TransactionStatus[] = []
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
@@ -37,6 +38,7 @@ export class TransactionsStore implements Resettable {
             name: this.nameFilter,
             wallets: this.wallets,
             types: this.types,
+            statuses: this.statuses,
         }
     }
 
@@ -180,6 +182,12 @@ export class TransactionsStore implements Resettable {
     @action
     public setTypes(types: TransactionType[]): void {
         this.types = types
+        this.aggregate = this.getAggregate()
+    }
+
+    @action
+    public setStatuses(statuses: TransactionStatus[]): void {
+        this.statuses = statuses
         this.aggregate = this.getAggregate()
     }
 

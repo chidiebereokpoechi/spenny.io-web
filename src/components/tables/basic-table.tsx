@@ -28,6 +28,8 @@ export const BasicTable = <T extends object>({ columns, data, ...props }: React.
                 defaultColumn,
                 data,
                 initialState: { pageSize: PAGE_SIZE },
+                autoResetSortBy: false,
+                autoResetPage: false,
                 ...props,
             },
             useSortBy,

@@ -7,7 +7,7 @@ import { DateInput, SelectInput, TextInput } from '../../components/input'
 import { DashboardPageWrapper, Loader } from '../../components/layout'
 import { DomainTransaction } from '../../domain'
 import { Category } from '../../models/response'
-import { TransactionType, transactionTypeOptions } from '../../util/constants'
+import { TransactionStatus, transactionStatusOptions, TransactionType, transactionTypeOptions } from '../../util/constants'
 import useDimensions from '../../util/misc/dimensions'
 import { useStores } from '../../util/stores'
 import { TransactionsTable } from './components/transactions-table'
@@ -28,6 +28,7 @@ export const TrackerPage: React.FC = observer(() => {
     const wallets = walletsStore.wallets
     const selectedWallets = transactionsStore.wallets
     const selectedTypes = transactionsStore.types
+    const selectedStatuses = transactionsStore.statuses
     const activeTracker = trackersStore.activeTracker
     const trackersLoading = trackersStore.loading
     const transactionsLoading = transactionsStore.loading
@@ -79,6 +80,10 @@ export const TrackerPage: React.FC = observer(() => {
 
     const selectTypes = (types: TransactionType[]) => {
         transactionsStore.setTypes(types)
+    }
+
+    const selectStatuses = (statuses: TransactionStatus[]) => {
+        transactionsStore.setStatuses(statuses)
     }
 
     useEffect(() => {
@@ -205,6 +210,19 @@ export const TrackerPage: React.FC = observer(() => {
                                 accessor={{ display: 'display', value: 'value' }}
                                 onChange={selectTypes}
                                 value={selectedTypes}
+                            />
+                        </div>
+                        <div className="w-[300px]">
+                            <SelectInput
+                                name="statuses"
+                                label="Filter by status"
+                                placeholder="Select statuses"
+                                multiple
+                                alwaysShowLabel
+                                options={transactionStatusOptions}
+                                accessor={{ display: 'display', value: 'value' }}
+                                onChange={selectStatuses}
+                                value={selectedStatuses}
                             />
                         </div>
                     </div>

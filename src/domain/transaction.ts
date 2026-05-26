@@ -164,11 +164,12 @@ export class DomainTransaction {
     }
 
     public filter(filter: TransactionFilter): boolean {
-        const { name, wallets, types } = filter
+        const { name, wallets, types, statuses } = filter
 
         if (name && !this.label.toLowerCase().includes(name.toLowerCase())) return false
         if (wallets && wallets.length && (!this.wallet || !wallets.includes(this.wallet.id))) return false
         if (types && types.length && !types.includes(this.type)) return false
+        if (statuses && statuses.length && !statuses.includes(this.status)) return false
 
         return true
     }
