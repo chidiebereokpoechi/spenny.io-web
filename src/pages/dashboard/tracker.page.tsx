@@ -7,6 +7,7 @@ import { DateInput, SelectInput, TextInput } from '../../components/input'
 import { DashboardPageWrapper, Loader } from '../../components/layout'
 import { DomainTransaction } from '../../domain'
 import { Category } from '../../models/response'
+import { TransactionType, transactionTypeOptions } from '../../util/constants'
 import useDimensions from '../../util/misc/dimensions'
 import { useStores } from '../../util/stores'
 import { TransactionsTable } from './components/transactions-table'
@@ -26,6 +27,7 @@ export const TrackerPage: React.FC = observer(() => {
     const hasTransactions = !!transactions?.length
     const wallets = walletsStore.wallets
     const selectedWallets = transactionsStore.wallets
+    const selectedTypes = transactionsStore.types
     const activeTracker = trackersStore.activeTracker
     const trackersLoading = trackersStore.loading
     const transactionsLoading = transactionsStore.loading
@@ -73,6 +75,10 @@ export const TrackerPage: React.FC = observer(() => {
 
     const selectWallets = (wallets: number[]) => {
         transactionsStore.setWallets(wallets)
+    }
+
+    const selectTypes = (types: TransactionType[]) => {
+        transactionsStore.setTypes(types)
     }
 
     useEffect(() => {
@@ -186,6 +192,19 @@ export const TrackerPage: React.FC = observer(() => {
                                 accessor={{ display: 'label', value: 'id' }}
                                 onChange={selectWallets}
                                 value={selectedWallets}
+                            />
+                        </div>
+                        <div className="w-[300px]">
+                            <SelectInput
+                                name="types"
+                                label="Filter by type"
+                                placeholder="Select types"
+                                multiple
+                                alwaysShowLabel
+                                options={transactionTypeOptions}
+                                accessor={{ display: 'display', value: 'value' }}
+                                onChange={selectTypes}
+                                value={selectedTypes}
                             />
                         </div>
                     </div>

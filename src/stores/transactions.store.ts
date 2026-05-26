@@ -20,6 +20,7 @@ export class TransactionsStore implements Resettable {
     public date: Date = new Date()
     public nameFilter: string = ''
     public wallets: number[] = []
+    public types: TransactionType[] = []
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
@@ -35,6 +36,7 @@ export class TransactionsStore implements Resettable {
         return {
             name: this.nameFilter,
             wallets: this.wallets,
+            types: this.types,
         }
     }
 
@@ -172,6 +174,12 @@ export class TransactionsStore implements Resettable {
     @action
     public setWallets(wallets: number[]): void {
         this.wallets = wallets
+        this.aggregate = this.getAggregate()
+    }
+
+    @action
+    public setTypes(types: TransactionType[]): void {
+        this.types = types
         this.aggregate = this.getAggregate()
     }
 
